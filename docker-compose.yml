@@ -1,0 +1,18 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: matrimony-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: matrimony_secret
+      MARIADB_DATABASE: matrimony_hub
+      MARIADB_USER: matrimony_user
+      MARIADB_PASSWORD: matrimony_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  mariadb_data:

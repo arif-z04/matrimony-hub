@@ -1,26 +1,43 @@
-## .NET Core
-*.swp
-*.*~
-project.lock.json
-.DS_Store
-*.pyc
-nupkg/
-
-# Visual Studio / VS Code
-.vscode/
-.vs/
+## .NET / C#
 **/[Bb]in/
 **/[Oo]bj/
 *.user
 *.userosscache
 *.suo
 *.userprefs
+project.lock.json
+project.fragment.lock.json
+artifacts/
+TestResults/
+*.coverage
+*.coveragexml
 
-# Environment & Secrets
+## Visual Studio / VS Code / JetBrains Rider
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.sln.docstates
+
+## Environment, Secrets & Local Overrides
 .env
+.env.local
 *.local.json
 appsettings.Production.json
+appsettings.*.local.json
 
-# User Uploads (keep directory structure)
+## User Uploads (keep directory structure)
 src/MatrimonyHub.Web/wwwroot/uploads/*/*
 !src/MatrimonyHub.Web/wwwroot/uploads/*/.gitkeep
+
+## OS & Editor Files
+.DS_Store
+Thumbs.db
+*.swp
+*.*~
+*.tmp
+*.pyc
+nupkg/

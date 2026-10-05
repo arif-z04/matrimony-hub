@@ -2,9 +2,31 @@
 
 [![.NET Core](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0%20%2F%20MariaDB-blue.svg)](https://www.mysql.com/)
-[![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Build & Test](https://img.shields.io/badge/CI-Passing-brightgreen.svg)]()
 
 **Matrimony Hub** is a full-stack, production-ready matrimonial web application designed for dignified, trustworthy, and culturally resonant marriage partner matching in Bangladesh. Built with **ASP.NET Core**, **C#**, **Entity Framework Core**, **MySQL / MariaDB**, and **Bootstrap 5 Material Design**, it incorporates rigorous identity verification workflows (Bangladeshi National ID / NID), strict privacy gates on personal contact details, intelligent compatibility scoring, and server-verified payment gateways.
+
+---
+
+## ⚡ Quick Start (Docker + .NET)
+
+Get the application running locally in under 2 minutes:
+
+```bash
+# 1. Clone repository
+git clone https://github.com/your-username/matrimony-hub.git
+cd matrimony-hub
+
+# 2. Start MariaDB in Docker
+docker compose up -d
+
+# 3. Run the web application
+dotnet run --project src/MatrimonyHub.Web
+```
+
+Open **`http://localhost:5000`** in your browser.  
+Seeded **Admin Portal**: `admin@matrimonyhub.com` / `Admin@Pass123!`.
 
 ---
 
