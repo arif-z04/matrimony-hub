@@ -93,7 +93,7 @@
 
             <div class="col-lg-5 text-center position-relative">
                 <div class="position-relative d-inline-block">
-                    <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=700&q=80" 
+                    <img src="/images/hero-bangladeshi-couple.jpg" 
                          alt="Happy Bangladeshi Married Couple" 
                          class="img-fluid rounded-4 shadow-lg" 
                          style="max-height: 480px; width: 100%; object-fit: cover; border: 6px solid #FFFFFF;">
@@ -166,7 +166,7 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="matrimony-card h-100 d-flex flex-column">
                             <div class="profile-avatar-wrapper">
-                                <img src="@(string.IsNullOrEmpty(p.PrimaryPhotoUrl) ? (p.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg") : p.PrimaryPhotoUrl)" 
+                                <img src="@(string.IsNullOrEmpty(p.PrimaryPhotoUrl) ? (p.Gender == Gender.Female ? "/images/default-bride.jpg" : "/images/default-groom.jpg") : p.PrimaryPhotoUrl)" 
                                      alt="@p.FullName" 
                                      class="profile-avatar-img" />
                                 <div class="position-absolute top-0 end-0 m-3">

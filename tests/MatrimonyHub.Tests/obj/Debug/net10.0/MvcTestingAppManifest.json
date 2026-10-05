@@ -1,6 +1,0 @@
-{
-  "MatrimonyHub.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/noir\/Work\/Matrimony-hub\/src\/MatrimonyHub.Application",
-  "MatrimonyHub.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/noir\/Work\/Matrimony-hub\/src\/MatrimonyHub.Domain",
-  "MatrimonyHub.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/noir\/Work\/Matrimony-hub\/src\/MatrimonyHub.Infrastructure",
-  "MatrimonyHub.Web, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/noir\/Work\/Matrimony-hub\/src\/MatrimonyHub.Web"
-}

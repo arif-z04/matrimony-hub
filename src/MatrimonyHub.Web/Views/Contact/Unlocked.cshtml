@@ -20,7 +20,7 @@
                 <div class="col-lg-6">
                     <div class="matrimony-card p-4 h-100">
                         <div class="d-flex gap-3 align-items-start">
-                            <img src="@(string.IsNullOrEmpty(p.PrimaryPhotoUrl) ? (p.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg") : p.PrimaryPhotoUrl)" 
+                            <img src="@(string.IsNullOrEmpty(p.PrimaryPhotoUrl) ? (p.Gender == Gender.Female ? "/images/default-bride.jpg" : "/images/default-groom.jpg") : p.PrimaryPhotoUrl)" 
                                  alt="@p.FullName" 
                                  class="rounded-3 shadow-sm" 
                                  style="width: 100px; height: 100px; object-fit: cover;" />

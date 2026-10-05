@@ -70,12 +70,12 @@ ON DUPLICATE KEY UPDATE `FullName` = VALUES(`FullName`);
 
 -- 5. Seed Profile Photos
 INSERT INTO `ProfilePhotos` (`Id`, `UserProfileId`, `PhotoUrl`, `IsPrimary`, `CreatedAt`) VALUES
-(1, 1, 'https://randomuser.me/api/portraits/men/32.jpg', 1, '2025-02-01 10:10:00'),
-(2, 2, 'https://randomuser.me/api/portraits/women/44.jpg', 1, '2025-02-05 11:40:00'),
-(3, 3, 'https://randomuser.me/api/portraits/men/46.jpg', 1, '2025-02-10 14:25:00'),
-(4, 4, 'https://randomuser.me/api/portraits/women/68.jpg', 1, '2025-02-15 16:55:00'),
-(5, 5, 'https://randomuser.me/api/portraits/men/75.jpg', 1, '2025-03-01 09:30:00'),
-(6, 6, 'https://randomuser.me/api/portraits/women/90.jpg', 1, '2025-03-05 12:20:00')
+(1, 1, '/images/groom-1.jpg', 1, '2025-02-01 10:10:00'),
+(2, 2, '/images/bride-1.jpg', 1, '2025-02-05 11:40:00'),
+(3, 3, '/images/groom-2.jpg', 1, '2025-02-10 14:25:00'),
+(4, 4, '/images/bride-2.jpg', 1, '2025-02-15 16:55:00'),
+(5, 5, '/images/groom-3.jpg', 1, '2025-03-01 09:30:00'),
+(6, 6, '/images/bride-3.jpg', 1, '2025-03-05 12:20:00')
 ON DUPLICATE KEY UPDATE `PhotoUrl` = VALUES(`PhotoUrl`);
 
 -- 6. Seed Partner Preferences
@@ -100,9 +100,9 @@ ON DUPLICATE KEY UPDATE `Status` = VALUES(`Status`);
 
 -- 8. Seed Sample Success Stories
 INSERT INTO `SuccessStories` (`Id`, `CoupleNames`, `StoryTitle`, `StoryDescription`, `PhotoUrl`, `MarriageDate`, `Location`, `Status`, `ApprovedByAdminId`, `CreatedAt`) VALUES
-(1, 'Tahsin & Farhana', 'Found My Soulmate in Just 3 Months', 'We both joined Matrimony Hub seeking genuine life partners with aligned Islamic values. After unlocking contacts and having families meet, everything progressed with grace and blessing.', 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80', '2025-12-10', 'Dhaka, Bangladesh', 2, 1, '2025-12-15 10:00:00'),
-(2, 'Saimon & Nazia', 'A Modern Match Rooted in Mutual Respect', 'Finding someone who respects both your career aspirations and family heritage felt daunting until Matrimony Hub. The verified profiles gave our parents absolute peace of mind.', 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80', '2026-01-15', 'Chittagong, Bangladesh', 2, 1, '2026-01-20 11:00:00'),
-(3, 'Zubair & Tasnim', 'From Match Score to Nikah', 'Our 95% match compatibility score proved surprisingly accurate! From mutual interests in travel to shared spiritual values, we couldn''t be happier.', 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80', '2026-02-20', 'Sylhet, Bangladesh', 2, 1, '2026-02-25 15:00:00')
+(1, 'Tahsin & Farhana', 'Found My Soulmate in Just 3 Months', 'We both joined Matrimony Hub seeking genuine life partners with aligned Islamic values. After unlocking contacts and having families meet, everything progressed with grace and blessing.', '/images/success-story-1.jpg', '2025-12-10', 'Dhaka, Bangladesh', 2, 1, '2025-12-15 10:00:00'),
+(2, 'Saimon & Nazia', 'A Modern Match Rooted in Mutual Respect', 'Finding someone who respects both your career aspirations and family heritage felt daunting until Matrimony Hub. The verified profiles gave our parents absolute peace of mind.', '/images/success-story-2.jpg', '2026-01-15', 'Chittagong, Bangladesh', 2, 1, '2026-01-20 11:00:00'),
+(3, 'Zubair & Tasnim', 'From Match Score to Nikah', 'Our 95% match compatibility score proved surprisingly accurate! From mutual interests in travel to shared spiritual values, we couldn''t be happier.', '/images/hero-bangladeshi-couple.jpg', '2026-02-20', 'Sylhet, Bangladesh', 2, 1, '2026-02-25 15:00:00')
 ON DUPLICATE KEY UPDATE `CoupleNames` = VALUES(`CoupleNames`);
 
 -- 9. Seed Sample Payment, Transaction, and Unlocked Contact

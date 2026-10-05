@@ -3,7 +3,7 @@
     ViewData["Title"] = $"{Model.FullName} - Matrimonial Profile";
     var primaryPhoto = Model.Photos.FirstOrDefault(p => p.IsPrimary)?.PhotoUrl 
                        ?? Model.Photos.FirstOrDefault()?.PhotoUrl
-                       ?? (Model.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg");
+                       ?? (Model.Gender == Gender.Female ? "/images/default-bride.jpg" : "/images/default-groom.jpg");
     var unlockFee = (decimal)(ViewBag.UnlockFee ?? 500.00m);
 }
 

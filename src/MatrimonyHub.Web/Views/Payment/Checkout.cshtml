@@ -19,7 +19,7 @@
                 @if (target != null)
                 {
                     <div class="p-3 bg-light rounded-3 border mb-4 d-flex gap-3 align-items-center">
-                        <img src="@(string.IsNullOrEmpty(target.Photos.FirstOrDefault()?.PhotoUrl) ? (target.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg") : target.Photos.First().PhotoUrl)" 
+                        <img src="@(string.IsNullOrEmpty(target.Photos.FirstOrDefault()?.PhotoUrl) ? (target.Gender == Gender.Female ? "/images/default-bride.jpg" : "/images/default-groom.jpg") : target.Photos.First().PhotoUrl)" 
                              alt="@target.FullName" 
                              class="rounded-3" 
                              style="width: 70px; height: 70px; object-fit: cover;" />

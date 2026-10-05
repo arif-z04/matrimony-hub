@@ -121,7 +121,7 @@
                         <div class="col-md-6">
                             <div class="matrimony-card p-3 h-100 d-flex flex-column">
                                 <div class="d-flex gap-3 align-items-center mb-2">
-                                    <img src="@(string.IsNullOrEmpty(m.PrimaryPhotoUrl) ? (m.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg") : m.PrimaryPhotoUrl)" 
+                                    <img src="@(string.IsNullOrEmpty(m.PrimaryPhotoUrl) ? (m.Gender == Gender.Female ? "/images/default-bride.jpg" : "/images/default-groom.jpg") : m.PrimaryPhotoUrl)" 
                                          alt="@m.FullName" 
                                          class="rounded-3" 
                                          style="width: 70px; height: 70px; object-fit: cover;" />

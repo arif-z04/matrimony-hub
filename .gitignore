@@ -9,8 +9,8 @@ nupkg/
 # Visual Studio / VS Code
 .vscode/
 .vs/
-*/[Bb]in/
-*/[Oo]bj/
+**/[Bb]in/
+**/[Oo]bj/
 *.user
 *.userosscache
 *.suo

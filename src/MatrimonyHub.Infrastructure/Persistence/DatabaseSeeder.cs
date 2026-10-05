@@ -87,9 +87,18 @@ public static class DatabaseSeeder
                 {
                     await userManager.AddToRoleAsync(user, "User");
 
-                    var avatarGender = item.Gender == Gender.Male ? "men" : "women";
-                    var avatarId = Random.Shared.Next(1, 95);
-                    var photoUrl = $"https://randomuser.me/api/portraits/{avatarGender}/{avatarId}.jpg";
+                    var photoUrl = item.Name switch
+                    {
+                        "Tanvir Ahmed" => "/images/groom-1.jpg",
+                        "Nusrat Jahan" => "/images/bride-1.jpg",
+                        "Rahim Chowdhury" => "/images/groom-2.jpg",
+                        "Sadia Islam" => "/images/bride-2.jpg",
+                        "Kazi Farhan" => "/images/groom-3.jpg",
+                        "Anika Tabassum" => "/images/bride-3.jpg",
+                        "Sourav Roy" => "/images/groom-1.jpg",
+                        "Puja Sen" => "/images/bride-1.jpg",
+                        _ => (item.Gender == Gender.Female ? "/images/default-bride.jpg" : "/images/default-groom.jpg")
+                    };
 
                     var profile = new UserProfile
                     {
@@ -182,7 +191,7 @@ public static class DatabaseSeeder
                     CoupleNames = "Tahsin & Farhana",
                     StoryTitle = "Found My Soulmate in Just 3 Months",
                     StoryDescription = "We both joined Matrimony Hub seeking genuine life partners with aligned Islamic values. After unlocking contacts and having families meet, everything progressed with grace and blessing.",
-                    PhotoUrl = "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80",
+                    PhotoUrl = "/images/success-story-1.jpg",
                     MarriageDate = new DateTime(2025, 12, 10),
                     Location = "Dhaka, Bangladesh",
                     Status = SuccessStoryStatus.Approved,
@@ -194,7 +203,7 @@ public static class DatabaseSeeder
                     CoupleNames = "Saimon & Nazia",
                     StoryTitle = "A Modern Match Rooted in Mutual Respect",
                     StoryDescription = "Finding someone who respects both your career aspirations and family heritage felt daunting until Matrimony Hub. The verified profiles gave our parents absolute peace of mind.",
-                    PhotoUrl = "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
+                    PhotoUrl = "/images/success-story-2.jpg",
                     MarriageDate = new DateTime(2026, 1, 15),
                     Location = "Chittagong, Bangladesh",
                     Status = SuccessStoryStatus.Approved,
@@ -206,7 +215,7 @@ public static class DatabaseSeeder
                     CoupleNames = "Zubair & Tasnim",
                     StoryTitle = "From Match Score to Nikah",
                     StoryDescription = "Our 95% match compatibility score proved surprisingly accurate! From mutual interests in travel to shared spiritual values, we couldn't be happier.",
-                    PhotoUrl = "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80",
+                    PhotoUrl = "/images/hero-bangladeshi-couple.jpg",
                     MarriageDate = new DateTime(2026, 2, 20),
                     Location = "Sylhet, Bangladesh",
                     Status = SuccessStoryStatus.Approved,
