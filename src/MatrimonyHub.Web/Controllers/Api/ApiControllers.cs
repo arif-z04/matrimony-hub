@@ -132,7 +132,7 @@ public class PaymentsApiController : BaseApiController
     [Authorize]
     public async Task<IActionResult> Create([FromBody] InitiatePaymentDto dto)
     {
-        var returnUrl = Url.Action("Callback", "Payment", null, Request.Scheme)!;
+        var returnUrl = Url.Action("ProcessCallback", "Payment", null, Request.Scheme)!;
         var cancelUrl = Url.Action("Failed", "Payment", null, Request.Scheme)!;
 
         var result = await _paymentService.InitiateContactUnlockPaymentAsync(

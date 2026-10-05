@@ -52,7 +52,7 @@
                 </div>
 
                 <!-- Real Form Calling Server-Side Callback -->
-                <form method="post" action="/api/payments/callback" class="d-grid gap-2">
+                <form method="post" action="/Payment/ProcessCallback" class="d-grid gap-2">
                     <input type="hidden" name="TransactionId" value="@txn" />
                     <input type="hidden" name="GatewayTransactionId" value="@($"{gateway[..2].ToUpper()}-TRX-{Guid.NewGuid():N}"[..16])" />
                     <input type="hidden" name="Status" value="3" /> <!-- 3: Successful -->
@@ -63,7 +63,7 @@
                     </button>
                 </form>
 
-                <form method="post" action="/api/payments/callback" class="d-grid mt-2">
+                <form method="post" action="/Payment/ProcessCallback" class="d-grid mt-2">
                     <input type="hidden" name="TransactionId" value="@txn" />
                     <input type="hidden" name="Status" value="5" /> <!-- 5: Cancelled -->
                     <input type="hidden" name="FailureReason" value="Transaction cancelled by user at gateway" />

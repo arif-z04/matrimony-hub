@@ -103,102 +103,106 @@ public class PaymentService : IPaymentService
 
     public async Task<ServiceResult<bool>> ProcessPaymentCallbackAsync(PaymentCallbackDto callbackDto)
     {
-        using var transaction = await _db.Database.BeginTransactionAsync();
-        try
+        var strategy = _db.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
         {
-            var payment = await _db.Payments
-                .Include(p => p.User)
-                .Include(p => p.TargetProfile)
-                .FirstOrDefaultAsync(p => p.TransactionId == callbackDto.TransactionId);
-
-            if (payment == null)
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
             {
-                return ServiceResult<bool>.Failure("Payment record not found for transaction: " + callbackDto.TransactionId);
-            }
+                var payment = await _db.Payments
+                    .Include(p => p.User)
+                    .Include(p => p.TargetProfile)
+                    .FirstOrDefaultAsync(p => p.TransactionId == callbackDto.TransactionId);
 
-            // Idempotency: if already processed as successful, skip duplicate processing
-            if (payment.Status == PaymentStatus.Successful)
-            {
-                await transaction.CommitAsync();
-                return ServiceResult<bool>.Success(true, "Transaction already completed successfully.");
-            }
-
-            payment.GatewayTransactionId = callbackDto.GatewayTransactionId;
-            payment.CompletedAt = DateTime.UtcNow;
-
-            // Audit record for this gateway transaction
-            var pTransaction = new PaymentTransaction
-            {
-                PaymentId = payment.Id,
-                GatewayTransactionId = callbackDto.GatewayTransactionId,
-                GatewayResponse = callbackDto.RawPayload ?? callbackDto.Status.ToString(),
-                Amount = payment.Amount,
-                Status = callbackDto.Status,
-                CreatedAt = DateTime.UtcNow
-            };
-            _db.PaymentTransactions.Add(pTransaction);
-
-            if (callbackDto.Status == PaymentStatus.Successful)
-            {
-                payment.Status = PaymentStatus.Successful;
-                payment.FailureReason = null;
-                await _db.SaveChangesAsync();
-
-                // Unlock contact access
-                if (payment.TargetProfileId.HasValue)
+                if (payment == null)
                 {
-                    var unlockResult = await _contactAccessService.UnlockContactAsync(
-                        payment.UserId, payment.TargetProfileId.Value, payment.Id);
+                    return ServiceResult<bool>.Failure("Payment record not found for transaction: " + callbackDto.TransactionId);
+                }
 
-                    if (!unlockResult.Succeeded)
+                // Idempotency: if already processed as successful, skip duplicate processing
+                if (payment.Status == PaymentStatus.Successful)
+                {
+                    await transaction.CommitAsync();
+                    return ServiceResult<bool>.Success(true, "Transaction already completed successfully.");
+                }
+
+                payment.GatewayTransactionId = callbackDto.GatewayTransactionId;
+                payment.CompletedAt = DateTime.UtcNow;
+
+                // Audit record for this gateway transaction
+                var pTransaction = new PaymentTransaction
+                {
+                    PaymentId = payment.Id,
+                    GatewayTransactionId = callbackDto.GatewayTransactionId,
+                    GatewayResponse = callbackDto.RawPayload ?? callbackDto.Status.ToString(),
+                    Amount = payment.Amount,
+                    Status = callbackDto.Status,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _db.PaymentTransactions.Add(pTransaction);
+
+                if (callbackDto.Status == PaymentStatus.Successful)
+                {
+                    payment.Status = PaymentStatus.Successful;
+                    payment.FailureReason = null;
+                    await _db.SaveChangesAsync();
+
+                    // Unlock contact access
+                    if (payment.TargetProfileId.HasValue)
                     {
-                        _logger.LogWarning("Contact unlock warning: {Msg}", unlockResult.Message);
-                    }
+                        var unlockResult = await _contactAccessService.UnlockContactAsync(
+                            payment.UserId, payment.TargetProfileId.Value, payment.Id);
 
-                    // Send notification to buyer
-                    var partnerName = payment.TargetProfile?.FullName ?? "Partner";
-                    await _notificationService.CreateNotificationAsync(
-                        payment.UserId,
-                        "Contact Unlocked",
-                        $"You have successfully unlocked contact information for {partnerName}.",
-                        NotificationType.ContactUnlocked,
-                        payment.TargetProfileId.Value.ToString());
+                        if (!unlockResult.Succeeded)
+                        {
+                            _logger.LogWarning("Contact unlock warning: {Msg}", unlockResult.Message);
+                        }
 
-                    // Send notification to target profile
-                    if (payment.TargetProfile != null)
-                    {
+                        // Send notification to buyer
+                        var partnerName = payment.TargetProfile?.FullName ?? "Partner";
                         await _notificationService.CreateNotificationAsync(
-                            payment.TargetProfile.UserId,
-                            "Contact Information Requested",
-                            $"{payment.User.FullName} unlocked your contact details and may reach out to you soon.",
-                            NotificationType.ProfileViewed,
-                            payment.UserId.ToString());
-                    }
+                            payment.UserId,
+                            "Contact Unlocked",
+                            $"You have successfully unlocked contact information for {partnerName}.",
+                            NotificationType.ContactUnlocked,
+                            payment.TargetProfileId.Value.ToString());
 
-                    if (!string.IsNullOrWhiteSpace(payment.User.Email))
-                    {
-                        await _emailService.SendPaymentSuccessEmailAsync(
-                            payment.User.Email, payment.User.FullName, payment.TransactionId, payment.Amount);
+                        // Send notification to target profile
+                        if (payment.TargetProfile != null)
+                        {
+                            await _notificationService.CreateNotificationAsync(
+                                payment.TargetProfile.UserId,
+                                "Contact Information Requested",
+                                $"{payment.User.FullName} unlocked your contact details and may reach out to you soon.",
+                                NotificationType.ProfileViewed,
+                                payment.UserId.ToString());
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(payment.User.Email))
+                        {
+                            await _emailService.SendPaymentSuccessEmailAsync(
+                                payment.User.Email, payment.User.FullName, payment.TransactionId, payment.Amount);
+                        }
                     }
                 }
-            }
-            else
-            {
-                payment.Status = callbackDto.Status;
-                payment.FailureReason = callbackDto.FailureReason ?? "Payment failed or was cancelled.";
-                await _db.SaveChangesAsync();
-            }
+                else
+                {
+                    payment.Status = callbackDto.Status;
+                    payment.FailureReason = callbackDto.FailureReason ?? "Payment failed or was cancelled.";
+                    await _db.SaveChangesAsync();
+                }
 
-            await transaction.CommitAsync();
-            return ServiceResult<bool>.Success(payment.Status == PaymentStatus.Successful,
-                payment.Status == PaymentStatus.Successful ? "Payment verified and contact unlocked." : "Payment failed.");
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync();
-            _logger.LogError(ex, "Error processing payment callback for txn {TxnId}", callbackDto.TransactionId);
-            return ServiceResult<bool>.Failure("Transaction processing encountered an internal error.");
-        }
+                await transaction.CommitAsync();
+                return ServiceResult<bool>.Success(payment.Status == PaymentStatus.Successful,
+                    payment.Status == PaymentStatus.Successful ? "Payment verified and contact unlocked." : "Payment failed.");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, "Error processing payment callback for txn {TxnId}", callbackDto.TransactionId);
+                return ServiceResult<bool>.Failure("Transaction processing encountered an internal error.");
+            }
+        });
     }
 
     public async Task<List<PaymentHistoryDto>> GetUserPaymentHistoryAsync(int userId)

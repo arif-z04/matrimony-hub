@@ -62,7 +62,7 @@ public class PaymentController : BaseController
             return RedirectToAction("Checkout", new { targetProfileId = model.TargetProfileId });
         }
 
-        var returnUrl = Url.Action("Callback", "Payment", null, Request.Scheme)!;
+        var returnUrl = Url.Action("ProcessCallback", "Payment", null, Request.Scheme)!;
         var cancelUrl = Url.Action("Failed", "Payment", null, Request.Scheme)!;
 
         var result = await _paymentService.InitiateContactUnlockPaymentAsync(
@@ -96,9 +96,9 @@ public class PaymentController : BaseController
         return View("GatewayCheckout");
     }
 
-    // Server-side Callback verification endpoint
+    // Server-side Callback verification endpoint for MVC browser flow
     [HttpPost]
-    [Route("api/payments/callback")]
+    [IgnoreAntiforgeryToken]
     [Route("Payment/ProcessCallback")]
     public async Task<IActionResult> ProcessCallback([FromForm] PaymentCallbackDto dto)
     {
