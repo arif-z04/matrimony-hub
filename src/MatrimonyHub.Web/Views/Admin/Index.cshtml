@@ -4,14 +4,14 @@
 }
 
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
         <div>
             <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill small fw-bold mb-1">
                 <i class="bi bi-shield-lock-fill me-1"></i> Admin Portal
             </span>
             <h1 class="brand-font h3 fw-bold text-dark mb-0">Platform Overview & Metrics</h1>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
             <a asp-action="Verifications" class="btn btn-warning btn-sm fw-bold">
                 <i class="bi bi-hourglass-split me-1"></i> Pending NID (@Model.PendingNidVerifications)
             </a>
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Navigation Tabs -->
-    <ul class="nav nav-pills mb-4 bg-white p-2 rounded-3 border">
+    <ul class="nav nav-pills nav-pills-scrollable mb-4 bg-white rounded-3 border">
         <li class="nav-item">
             <a class="nav-link active fw-semibold" asp-action="Index"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a>
         </li>

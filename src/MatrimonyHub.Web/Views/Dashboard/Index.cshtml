@@ -18,7 +18,7 @@
                         @(profile?.FullName?[..1].ToUpper() ?? "U")
                     </div>
                     <div>
-                        <h2 class="h4 fw-bold mb-1 d-flex align-items-center gap-2">
+                        <h2 class="h4 fw-bold mb-1 d-flex flex-wrap align-items-center gap-2">
                             Welcome, @(profile?.FullName ?? User.Identity?.Name)
                             @if (profile?.IsVerified == true)
                             {
