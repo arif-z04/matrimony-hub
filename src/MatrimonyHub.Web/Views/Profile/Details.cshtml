@@ -1,0 +1,241 @@
+@model ProfileDetailDto
+@{
+    ViewData["Title"] = $"{Model.FullName} - Matrimonial Profile";
+    var primaryPhoto = Model.Photos.FirstOrDefault(p => p.IsPrimary)?.PhotoUrl 
+                       ?? Model.Photos.FirstOrDefault()?.PhotoUrl
+                       ?? (Model.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg");
+    var unlockFee = (decimal)(ViewBag.UnlockFee ?? 500.00m);
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-controller="Matches" asp-action="Index">Matches</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.FullName</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Left Column: Photo & Contact Status -->
+        <div class="col-lg-4">
+            <div class="matrimony-card p-3 mb-4">
+                <div class="profile-avatar-wrapper rounded-3 mb-3">
+                    <img src="@primaryPhoto" alt="@Model.FullName" class="profile-avatar-img" />
+                    <div class="position-absolute top-0 end-0 m-3">
+                        @if (Model.IsVerified)
+                        {
+                            <span class="verified-badge shadow"><i class="bi bi-patch-check-fill"></i> NID Verified</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Additional Gallery Photos -->
+                @if (Model.Photos.Count > 1)
+                {
+                    <div class="d-flex gap-2 overflow-auto pb-2 mb-3">
+                        @foreach (var ph in Model.Photos)
+                        {
+                            <img src="@ph.PhotoUrl" alt="Photo" class="rounded border" style="width: 60px; height: 60px; object-fit: cover; flex-shrink: 0;" />
+                        }
+                    </div>
+                }
+
+                <div class="text-center mb-3">
+                    <h3 class="h4 fw-bold mb-1">@Model.FullName</h3>
+                    <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger"></i> @Model.City, @Model.Division, @Model.Country</p>
+                    <span class="badge bg-light text-dark border px-3 py-1">@Model.Age Years | @(Model.HeightCm.HasValue ? $"{Model.HeightCm} cm" : "")</span>
+                </div>
+
+                @if (User.Identity?.IsAuthenticated == true && !Model.IsOwner)
+                {
+                    <div class="d-grid gap-2">
+                        <form asp-controller="Favorites" asp-action="Toggle" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="profileId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <button type="submit" class="btn btn-outline-secondary w-100 btn-sm">
+                                <i class="bi @(Model.IsFavorited ? "bi-heart-fill text-danger" : "bi-heart") me-1"></i>
+                                @(Model.IsFavorited ? "Remove from Favorites" : "Add to Favorites")
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+
+            <!-- Contact Information Box (STRICT PRIVACY ENFORCEMENT) -->
+            <div class="matrimony-card p-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-telephone-outbound text-primary"></i> Contact Information
+                </h5>
+
+                @if (Model.IsOwner || Model.IsContactUnlocked)
+                {
+                    <div class="p-3 bg-success-subtle rounded-3 border border-success-subtle mb-3">
+                        <span class="badge bg-success mb-2"><i class="bi bi-unlock-fill"></i> Unlocked Access</span>
+                        <div class="mb-2">
+                            <span class="small text-muted d-block">Phone Number:</span>
+                            <strong class="text-dark"><i class="bi bi-telephone me-1"></i> @Model.ContactPhone</strong>
+                        </div>
+                        <div class="mb-2">
+                            <span class="small text-muted d-block">Email Address:</span>
+                            <strong class="text-dark"><i class="bi bi-envelope me-1"></i> @Model.ContactEmail</strong>
+                        </div>
+                        <div>
+                            <span class="small text-muted d-block">Residence Location:</span>
+                            <strong class="text-dark"><i class="bi bi-geo-alt me-1"></i> @Model.ContactAddress</strong>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-0"><i class="bi bi-shield-check text-success"></i> You have verified access to this candidate's contact information.</p>
+                }
+                else
+                {
+                    <div class="locked-contact-card">
+                        <div class="bg-primary text-white rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-lock-fill fs-3"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1">Contact Details are Protected</h6>
+                        <p class="small text-muted mb-3">
+                            To ensure privacy and avoid spam, direct phone and email details are unlocked exclusively via payment.
+                        </p>
+                        <div class="p-2 bg-light rounded-2 small mb-3 border">
+                            Unlock Fee: <strong>BDT @unlockFee.ToString("N2")</strong>
+                        </div>
+                        <div class="d-grid">
+                            <a asp-controller="Payment" asp-action="Checkout" asp-route-targetProfileId="@Model.Id" class="btn btn-primary btn-sm py-2">
+                                <i class="bi bi-credit-card me-1"></i> Unlock Contact Information
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right Column: Profile Overview & Details -->
+        <div class="col-lg-8">
+            <!-- About Me -->
+            <div class="matrimony-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-lines-fill text-primary me-2"></i>About Me</h5>
+                <p class="text-muted leading-relaxed mb-0">
+                    @(string.IsNullOrWhiteSpace(Model.AboutMe) ? "No detailed description provided yet." : Model.AboutMe)
+                </p>
+            </div>
+
+            <!-- Basic & Lifestyle Details -->
+            <div class="matrimony-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-info-circle text-primary me-2"></i>Personal & Lifestyle Overview</h5>
+                <div class="row g-3 small">
+                    <div class="col-sm-6">
+                        <div class="text-muted">Marital Status</div>
+                        <div class="fw-bold text-dark">@Model.MaritalStatus</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Religion</div>
+                        <div class="fw-bold text-dark">@Model.Religion</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Mother Tongue</div>
+                        <div class="fw-bold text-dark">@Model.MotherTongue</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Nationality</div>
+                        <div class="fw-bold text-dark">@Model.Nationality</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Dietary Preference</div>
+                        <div class="fw-bold text-dark">@Model.DietaryPreference</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Smoking / Drinking</div>
+                        <div class="fw-bold text-dark">@(Model.Smoking ? "Smoker" : "Non-smoker") / @(Model.Drinking ? "Social Drinker" : "Does Not Drink")</div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Hobbies))
+                    {
+                        <div class="col-12">
+                            <div class="text-muted">Hobbies & Passions</div>
+                            <div class="fw-bold text-dark">@Model.Hobbies</div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Education & Profession -->
+            <div class="matrimony-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-briefcase text-primary me-2"></i>Education & Career</h5>
+                <div class="row g-3 small">
+                    <div class="col-sm-6">
+                        <div class="text-muted">Highest Degree</div>
+                        <div class="fw-bold text-dark">@(Model.HighestEducation ?? "Not specified")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Field / Subject</div>
+                        <div class="fw-bold text-dark">@(Model.Subject ?? "Not specified")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Institution</div>
+                        <div class="fw-bold text-dark">@(Model.Institution ?? "Not specified")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Graduation Year</div>
+                        <div class="fw-bold text-dark">@(Model.GraduationYear?.ToString() ?? "Not specified")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Occupation</div>
+                        <div class="fw-bold text-dark">@(Model.Occupation ?? "Not specified")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Company / Organization</div>
+                        <div class="fw-bold text-dark">@(Model.Company ?? "Not specified")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Designation</div>
+                        <div class="fw-bold text-dark">@(Model.JobTitle ?? "Not specified")</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-muted">Income Bracket</div>
+                        <div class="fw-bold text-dark">@(Model.IncomeRange ?? "Confidential")</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family & Expectations -->
+            <div class="matrimony-card p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-house-heart text-primary me-2"></i>Family Background & Expectations</h5>
+                <div class="mb-3">
+                    <h6 class="small fw-bold text-muted">Family Overview</h6>
+                    <p class="small text-dark mb-0">@(string.IsNullOrWhiteSpace(Model.FamilyInfo) ? "Family information not provided." : Model.FamilyInfo)</p>
+                </div>
+                <div>
+                    <h6 class="small fw-bold text-muted">Partner Expectations</h6>
+                    <p class="small text-dark mb-0">@(string.IsNullOrWhiteSpace(Model.PartnerExpectations) ? "No special expectations specified." : Model.PartnerExpectations)</p>
+                </div>
+            </div>
+
+            <!-- Partner Preferences -->
+            @if (Model.PartnerPreference != null)
+            {
+                <div class="matrimony-card p-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-sliders text-primary me-2"></i>Desired Partner Criteria</h5>
+                    <div class="row g-3 small">
+                        <div class="col-sm-6">
+                            <div class="text-muted">Preferred Age Range</div>
+                            <div class="fw-bold text-dark">@(Model.PartnerPreference.MinAge.HasValue ? $"{Model.PartnerPreference.MinAge} - {Model.PartnerPreference.MaxAge} Years" : "Any Age")</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted">Preferred Religion</div>
+                            <div class="fw-bold text-dark">@(Model.PartnerPreference.PreferredReligion?.ToString() ?? "Any")</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted">Preferred Division</div>
+                            <div class="fw-bold text-dark">@(Model.PartnerPreference.PreferredDivision ?? "Any Division")</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted">Preferred Marital Status</div>
+                            <div class="fw-bold text-dark">@(Model.PartnerPreference.PreferredMaritalStatus?.ToString() ?? "Never Married")</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

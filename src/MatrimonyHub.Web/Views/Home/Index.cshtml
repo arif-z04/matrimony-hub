@@ -1,0 +1,281 @@
+@{
+    ViewData["Title"] = "Find Someone Special. Build a Lifetime Together.";
+    var featuredStories = ViewBag.FeaturedStories as List<SuccessStoryDto> ?? new List<SuccessStoryDto>();
+    var featuredProfiles = ViewBag.FeaturedProfiles as List<ProfileCardDto> ?? new List<ProfileCardDto>();
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <span class="badge px-3 py-2 rounded-pill mb-3" style="background-color: var(--primary-light); color: var(--primary-color); font-weight: 600;">
+                    <i class="bi bi-shield-fill-check me-1"></i> Bangladesh's Most Trusted Matrimonial Network
+                </span>
+                <h1 class="hero-headline">
+                    Find Someone Special. <br />
+                    <span>Build a Lifetime Together.</span>
+                </h1>
+                <p class="hero-subtext">
+                    Discover compatible, verified matrimonial partners across Bangladesh. With government NID verification and private contact protection, your journey to marriage is dignified and safe.
+                </p>
+
+                <!-- Search Match Oriented CTA Box -->
+                <div class="card border-0 shadow-lg p-4 rounded-4 bg-white">
+                    <form asp-controller="Matches" asp-action="Index" method="get">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">I'm looking for</label>
+                                <select name="Gender" class="form-select border-1">
+                                    <option value="2">a Bride (Female)</option>
+                                    <option value="1">a Groom (Male)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Aged</label>
+                                <div class="d-flex align-items-center gap-1">
+                                    <input type="number" name="MinAge" class="form-control" value="21" min="18" max="70" />
+                                    <span class="text-muted small">to</span>
+                                    <input type="number" name="MaxAge" class="form-control" value="32" min="18" max="70" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Religion</label>
+                                <select name="Religion" class="form-select border-1">
+                                    <option value="">Any Religion</option>
+                                    <option value="1" selected>Islam</option>
+                                    <option value="2">Hinduism</option>
+                                    <option value="3">Christianity</option>
+                                    <option value="4">Buddhism</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Division</label>
+                                <select name="Division" class="form-select border-1">
+                                    <option value="">Any Division</option>
+                                    <option value="Dhaka">Dhaka</option>
+                                    <option value="Chittagong">Chittagong</option>
+                                    <option value="Sylhet">Sylhet</option>
+                                    <option value="Rajshahi">Rajshahi</option>
+                                    <option value="Khulna">Khulna</option>
+                                    <option value="Barisal">Barisal</option>
+                                    <option value="Rangpur">Rangpur</option>
+                                    <option value="Mymensingh">Mymensingh</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="VerifiedOnly" value="true" id="checkVerifiedOnly" checked>
+                                <label class="form-check-label small text-muted" for="checkVerifiedOnly">
+                                    <i class="bi bi-patch-check-fill text-success me-1"></i> Show Verified NID Profiles Only
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-primary px-4 py-2">
+                                <i class="bi bi-search me-1"></i> Let's Find Matches
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Trust Indicators -->
+                <div class="d-flex flex-wrap align-items-center gap-4 mt-4 pt-2 text-muted small">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-lock-fill text-primary fs-5"></i>
+                        <span>Strict Privacy & Secure Contact Gate</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-person-check-fill text-success fs-5"></i>
+                        <span>100% NID Document Verified</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 text-center position-relative">
+                <div class="position-relative d-inline-block">
+                    <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=700&q=80" 
+                         alt="Happy Bangladeshi Married Couple" 
+                         class="img-fluid rounded-4 shadow-lg" 
+                         style="max-height: 480px; width: 100%; object-fit: cover; border: 6px solid #FFFFFF;">
+                    
+                    <div class="position-absolute bottom-0 start-0 translate-middle-y bg-white p-3 rounded-4 shadow-sm border border-light d-flex align-items-center gap-3 ms-n3" style="max-width: 250px;">
+                        <div class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="bi bi-patch-check-fill fs-5"></i>
+                        </div>
+                        <div class="text-start">
+                            <h6 class="mb-0 fw-bold small text-dark">Verified Identity</h6>
+                            <span class="small text-muted" style="font-size: 0.75rem;">Govt. NID Checked</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Real Database Statistics Section (Strictly NO Fake Numbers) -->
+<section class="py-5 bg-white border-bottom">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number">@ViewBag.TotalProfilesCount</div>
+                    <div class="stat-label">Active Profiles</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number text-success">@ViewBag.VerifiedCount</div>
+                    <div class="stat-label">NID Verified Members</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number" style="color: var(--secondary-color);">@ViewBag.SuccessfulMatchesCount</div>
+                    <div class="stat-label">Contacts Unlocked</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-box">
+                    <div class="stat-number">@ViewBag.SuccessStoriesCount</div>
+                    <div class="stat-label">Success Stories</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Verified Profiles -->
+@if (featuredProfiles.Any())
+{
+    <section class="py-5" style="background-color: var(--light-bg);">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h2 class="h3 fw-bold mb-1">Featured Verified Profiles</h2>
+                    <p class="text-muted small mb-0">Browse recently verified members looking for a meaningful marriage partner</p>
+                </div>
+                <a asp-controller="Matches" asp-action="Index" class="btn btn-outline-primary btn-sm px-3">
+                    View All Matches <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var p in featuredProfiles)
+                {
+                    <div class="col-lg-3 col-md-6">
+                        <div class="matrimony-card h-100 d-flex flex-column">
+                            <div class="profile-avatar-wrapper">
+                                <img src="@(string.IsNullOrEmpty(p.PrimaryPhotoUrl) ? (p.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg") : p.PrimaryPhotoUrl)" 
+                                     alt="@p.FullName" 
+                                     class="profile-avatar-img" />
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    @if (p.IsVerified)
+                                    {
+                                        <span class="verified-badge shadow-sm"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="p-3 d-flex flex-column flex-grow-1">
+                                <h5 class="fw-bold text-dark mb-1">@p.FullName, @p.Age</h5>
+                                <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> @p.City, @p.Division</p>
+                                <p class="small text-secondary mb-3">
+                                    <i class="bi bi-briefcase-fill me-1"></i> @p.Occupation <br />
+                                    <i class="bi bi-mortarboard-fill me-1"></i> @p.HighestEducation
+                                </p>
+                                <div class="mt-auto d-grid">
+                                    <a asp-controller="Profile" asp-action="Details" asp-route-id="@p.Id" class="btn btn-outline-primary btn-sm">
+                                        View Full Profile
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Featured Real Success Stories -->
+@if (featuredStories.Any())
+{
+    <section class="py-5 bg-white border-top">
+        <div class="container">
+            <div class="text-center max-w-xl mx-auto mb-5">
+                <span class="badge bg-light text-primary px-3 py-2 rounded-pill fw-semibold mb-2">Real Marriages</span>
+                <h2 class="h3 fw-bold">From Matrimony Hub to Happy Marriages</h2>
+                <p class="text-muted small">Every week, new couples begin their lifelong journey through our trusted platform.</p>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var story in featuredStories)
+                {
+                    <div class="col-md-4">
+                        <div class="matrimony-card h-100">
+                            @if (!string.IsNullOrEmpty(story.PhotoUrl))
+                            {
+                                <img src="@story.PhotoUrl" alt="@story.CoupleNames" class="w-100" style="height: 220px; object-fit: cover;" />
+                            }
+                            <div class="p-4">
+                                <span class="badge bg-light text-muted mb-2 small"><i class="bi bi-geo-alt me-1"></i> @story.Location</span>
+                                <h5 class="fw-bold text-dark mb-2">@story.CoupleNames</h5>
+                                <h6 class="small text-primary fw-bold mb-2">"@story.StoryTitle"</h6>
+                                <p class="small text-muted">@story.StoryDescription</p>
+                                <div class="text-muted small border-top pt-2 mt-3" style="font-size: 0.78rem;">
+                                    Married on: @story.MarriageDate.ToString("MMMM dd, yyyy")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="text-center mt-4 pt-2">
+                <a asp-controller="SuccessStories" asp-action="Index" class="btn btn-outline-primary px-4">
+                    Read More Success Stories <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Why Matrimony Hub Works -->
+<section class="py-5" style="background-color: #FAF4EB;">
+    <div class="container py-3">
+        <div class="text-center mb-5">
+            <h2 class="h3 fw-bold">Why Choose Matrimony Hub?</h2>
+            <p class="text-muted small">Designed with the highest standards of dignity, Islamic and family ethics, and modern security.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 border h-100 shadow-sm">
+                    <div class="bg-primary text-white rounded-3 p-3 d-inline-block mb-3">
+                        <i class="bi bi-patch-check-fill fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Government NID Verification</h5>
+                    <p class="text-muted small mb-0">Every profile can submit their National Identity Card (NID) for administrative compliance review, filtering out bad actors and building true confidence.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 border h-100 shadow-sm">
+                    <div class="bg-primary text-white rounded-3 p-3 d-inline-block mb-3">
+                        <i class="bi bi-shield-lock-fill fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Protected Contact Unlock</h5>
+                    <p class="text-muted small mb-0">Personal phone numbers and contact emails are strictly protected behind verified server-side payment gates. No unsolicited spam, guaranteed.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 border h-100 shadow-sm">
+                    <div class="bg-primary text-white rounded-3 p-3 d-inline-block mb-3">
+                        <i class="bi bi-cpu-fill fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Intelligent Compatibility Score</h5>
+                    <p class="text-muted small mb-0">Our scoring engine evaluates age preferences, educational background, location proximity, profession, and lifestyle values to deliver honest recommendations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

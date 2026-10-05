@@ -1,0 +1,26 @@
+## .NET Core
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
+
+# Visual Studio / VS Code
+.vscode/
+.vs/
+*/[Bb]in/
+*/[Oo]bj/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# Environment & Secrets
+.env
+*.local.json
+appsettings.Production.json
+
+# User Uploads (keep directory structure)
+src/MatrimonyHub.Web/wwwroot/uploads/*/*
+!src/MatrimonyHub.Web/wwwroot/uploads/*/.gitkeep

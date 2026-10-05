@@ -1,0 +1,216 @@
+@model PagedResult<ProfileCardDto>
+@{
+    ViewData["Title"] = "Find Compatible Matches";
+    var filter = ViewBag.Filter as MatchFilterDto ?? new MatchFilterDto();
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb & Header -->
+    <div class="mb-4">
+        <h1 class="brand-font h3 fw-bold text-dark mb-1">Find Your Life Partner</h1>
+        <p class="text-muted small">Explore genuine, database-verified profiles matching your preferences across Bangladesh</p>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="matrimony-card p-4 rounded-4 mb-4">
+        <form method="get" asp-action="Index">
+            <div class="row g-3">
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Gender</label>
+                    <select name="Gender" class="form-select form-select-sm">
+                        <option value="">All Genders</option>
+                        <option value="1" selected="@(filter.Gender == Gender.Male)">Male (Groom)</option>
+                        <option value="2" selected="@(filter.Gender == Gender.Female)">Female (Bride)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Age Range</label>
+                    <div class="input-group input-group-sm">
+                        <input type="number" name="MinAge" class="form-control" placeholder="Min" value="@filter.MinAge" min="18" max="75" />
+                        <span class="input-group-text">to</span>
+                        <input type="number" name="MaxAge" class="form-control" placeholder="Max" value="@filter.MaxAge" min="18" max="75" />
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Religion</label>
+                    <select name="Religion" class="form-select form-select-sm">
+                        <option value="">Any</option>
+                        <option value="1" selected="@(filter.Religion == Religion.Islam)">Islam</option>
+                        <option value="2" selected="@(filter.Religion == Religion.Hinduism)">Hinduism</option>
+                        <option value="3" selected="@(filter.Religion == Religion.Christianity)">Christianity</option>
+                        <option value="4" selected="@(filter.Religion == Religion.Buddhism)">Buddhism</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Division</label>
+                    <select name="Division" class="form-select form-select-sm">
+                        <option value="">All Divisions</option>
+                        <option value="Dhaka" selected="@(filter.Division == "Dhaka")">Dhaka</option>
+                        <option value="Chittagong" selected="@(filter.Division == "Chittagong")">Chittagong</option>
+                        <option value="Sylhet" selected="@(filter.Division == "Sylhet")">Sylhet</option>
+                        <option value="Rajshahi" selected="@(filter.Division == "Rajshahi")">Rajshahi</option>
+                        <option value="Khulna" selected="@(filter.Division == "Khulna")">Khulna</option>
+                        <option value="Barisal" selected="@(filter.Division == "Barisal")">Barisal</option>
+                        <option value="Rangpur" selected="@(filter.Division == "Rangpur")">Rangpur</option>
+                        <option value="Mymensingh" selected="@(filter.Division == "Mymensingh")">Mymensingh</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Sort By</label>
+                    <select name="SortBy" class="form-select form-select-sm">
+                        <option value="match" selected="@(filter.SortBy == "match")">Match Score</option>
+                        <option value="newest" selected="@(filter.SortBy == "newest")">Newest Profiles</option>
+                        <option value="age_asc" selected="@(filter.SortBy == "age_asc")">Age: Young to Old</option>
+                        <option value="age_desc" selected="@(filter.SortBy == "age_desc")">Age: Old to Young</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="Keyword" class="form-control" placeholder="Keyword (e.g. Engineer, Doctor, BUET, IBA, Gulshan)" value="@filter.Keyword" />
+                    </div>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="VerifiedOnly" value="true" id="filterVerifiedOnly" @(filter.VerifiedOnly == true ? "checked" : "")>
+                        <label class="form-check-label small fw-semibold" for="filterVerifiedOnly">
+                            <i class="bi bi-patch-check-fill text-success"></i> NID Verified Only
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-3 d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Apply Filters</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="small text-muted">Showing <strong>@Model.Items.Count</strong> of <strong>@Model.TotalCount</strong> potential matches</span>
+    </div>
+
+    <!-- Profile Cards Grid -->
+    @if (Model.Items.Any())
+    {
+        <div class="row g-4 mb-4">
+            @foreach (var p in Model.Items)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="matrimony-card h-100 d-flex flex-column">
+                        <div class="profile-avatar-wrapper position-relative">
+                            <img src="@(string.IsNullOrEmpty(p.PrimaryPhotoUrl) ? (p.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg") : p.PrimaryPhotoUrl)" 
+                                 alt="@p.FullName" 
+                                 class="profile-avatar-img" />
+                            
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <span class="match-score-badge"><i class="bi bi-stars"></i> @p.MatchScore% Match</span>
+                            </div>
+
+                            <div class="position-absolute top-0 end-0 m-3 d-flex gap-1">
+                                @if (p.IsVerified)
+                                {
+                                    <span class="verified-badge shadow-sm"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                                }
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <button class="btn btn-sm btn-light rounded-circle shadow-sm btn-fav-ajax p-1 px-2" data-profile-id="@p.Id" title="Add to Favorites">
+                                        <i class="bi @(p.IsFavorited ? "bi-heart-fill text-danger" : "bi-heart text-muted")"></i>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="p-4 d-flex flex-column flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                <h5 class="fw-bold text-dark mb-0">@p.FullName</h5>
+                                <span class="fw-semibold text-muted small">@p.Age yrs</span>
+                            </div>
+                            
+                            <p class="small text-muted mb-2">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> @p.City, @p.Division
+                            </p>
+
+                            <div class="p-2 bg-light rounded-3 small mb-3">
+                                <div class="d-flex align-items-center gap-1 mb-1">
+                                    <i class="bi bi-briefcase-fill text-muted me-1"></i>
+                                    <span class="text-truncate">@(p.Occupation ?? "Professional")</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="bi bi-mortarboard-fill text-muted me-1"></i>
+                                    <span class="text-truncate">@(p.HighestEducation ?? "Degree graduate")</span>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(p.AboutMeExcerpt))
+                            {
+                                <p class="small text-muted mb-3 italic">
+                                    "@p.AboutMeExcerpt"
+                                </p>
+                            }
+
+                            <!-- Actions -->
+                            <div class="mt-auto pt-2 border-top d-flex gap-2">
+                                <a asp-controller="Profile" asp-action="Details" asp-route-id="@p.Id" class="btn btn-outline-primary btn-sm flex-grow-1">
+                                    View Profile
+                                </a>
+
+                                @if (p.IsContactUnlocked)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success d-flex align-items-center px-2 py-1 small">
+                                        <i class="bi bi-unlock-fill me-1"></i> Unlocked
+                                    </span>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Payment" asp-action="Checkout" asp-route-targetProfileId="@p.Id" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-telephone-fill me-1"></i> Unlock
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Matches pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(Model.Page - 1)&Gender=@filter.Gender&MinAge=@filter.MinAge&MaxAge=@filter.MaxAge&Religion=@filter.Religion&Division=@filter.Division&SortBy=@filter.SortBy&Keyword=@filter.Keyword">Previous</a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(Model.Page == i ? "active" : "")">
+                            <a class="page-link" href="?page=@i&Gender=@filter.Gender&MinAge=@filter.MinAge&MaxAge=@filter.MaxAge&Religion=@filter.Religion&Division=@filter.Division&SortBy=@filter.SortBy&Keyword=@filter.Keyword">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(Model.Page + 1)&Gender=@filter.Gender&MinAge=@filter.MinAge&MaxAge=@filter.MaxAge&Religion=@filter.Religion&Division=@filter.Division&SortBy=@filter.SortBy&Keyword=@filter.Keyword">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+    else
+    {
+        <!-- Empty State -->
+        <div class="matrimony-card p-5 text-center my-4">
+            <i class="bi bi-search display-2 text-muted opacity-50 mb-3"></i>
+            <h4 class="fw-bold mb-2">No Profiles Matched Your Search</h4>
+            <p class="text-muted small mb-4">Try broadening your age range, division filter, or clearing keyword search terms.</p>
+            <a asp-action="Index" class="btn btn-primary px-4">Reset All Filters</a>
+        </div>
+    }
+</div>

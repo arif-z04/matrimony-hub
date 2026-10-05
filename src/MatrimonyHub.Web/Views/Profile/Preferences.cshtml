@@ -1,0 +1,94 @@
+@model UpdatePreferencesDto
+@{
+    ViewData["Title"] = "Partner Preferences";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="matrimony-card p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <div>
+                        <h2 class="brand-font h4 fw-bold mb-1">Partner Preferences</h2>
+                        <p class="text-muted small mb-0">Define the attributes most important to you to receive accurate recommendations</p>
+                    </div>
+                    <a asp-action="Edit" class="btn btn-outline-secondary btn-sm">Back to Profile</a>
+                </div>
+
+                <form asp-action="Preferences" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Age Preference</label>
+                            <div class="input-group">
+                                <input asp-for="MinAge" class="form-control" placeholder="Min (e.g. 22)" min="18" max="75" />
+                                <span class="input-group-text">to</span>
+                                <input asp-for="MaxAge" class="form-control" placeholder="Max (e.g. 30)" min="18" max="75" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PreferredGender" class="form-label small fw-bold">Preferred Partner Gender</label>
+                            <select asp-for="PreferredGender" class="form-select">
+                                <option value="">Any</option>
+                                <option value="2">Bride (Female)</option>
+                                <option value="1">Groom (Male)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PreferredReligion" class="form-label small fw-bold">Preferred Religion</label>
+                            <select asp-for="PreferredReligion" class="form-select">
+                                <option value="">Any</option>
+                                <option value="1">Islam</option>
+                                <option value="2">Hinduism</option>
+                                <option value="3">Christianity</option>
+                                <option value="4">Buddhism</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PreferredMaritalStatus" class="form-label small fw-bold">Marital Status</label>
+                            <select asp-for="PreferredMaritalStatus" class="form-select">
+                                <option value="">Any</option>
+                                <option value="1">Never Married</option>
+                                <option value="2">Divorced</option>
+                                <option value="3">Widowed</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PreferredDivision" class="form-label small fw-bold">Preferred Location (Division)</label>
+                            <select asp-for="PreferredDivision" class="form-select">
+                                <option value="">Any Division</option>
+                                <option value="Dhaka">Dhaka</option>
+                                <option value="Chittagong">Chittagong</option>
+                                <option value="Sylhet">Sylhet</option>
+                                <option value="Rajshahi">Rajshahi</option>
+                                <option value="Khulna">Khulna</option>
+                                <option value="Barisal">Barisal</option>
+                                <option value="Rangpur">Rangpur</option>
+                                <option value="Mymensingh">Mymensingh</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PreferredEducation" class="form-label small fw-bold">Preferred Degree</label>
+                            <input asp-for="PreferredEducation" class="form-control" placeholder="e.g. B.Sc, M.Sc, Masters" />
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Notes" class="form-label small fw-bold">Additional Specific Criteria</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Describe any religious, lifestyle, or family traits you consider important..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary px-5">Save Partner Preferences</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

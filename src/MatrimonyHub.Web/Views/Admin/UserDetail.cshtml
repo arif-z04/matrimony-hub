@@ -1,0 +1,189 @@
+@model AdminUserDetailDto
+@{
+    ViewData["Title"] = $"User Detail - {Model.FullName}";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="brand-font h3 fw-bold text-dark mb-1">User Inspection: @Model.FullName</h1>
+            <p class="text-muted small">User ID #@Model.Id | Registered on @Model.CreatedAt.ToString("MMMM dd, yyyy HH:mm")</p>
+        </div>
+        <a asp-action="Users" class="btn btn-outline-secondary btn-sm">Back to User Directory</a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Account Status & Moderation Controls -->
+        <div class="col-lg-4">
+            <div class="matrimony-card p-4 mb-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-shield-shaded text-primary me-2"></i>Account Standing</h5>
+                
+                <div class="mb-3">
+                    <span class="small text-muted d-block">Current Status:</span>
+                    @if (Model.AccountStatus == UserAccountStatus.Active)
+                    {
+                        <span class="badge bg-success fs-6">Active Account</span>
+                    }
+                    else if (Model.AccountStatus == UserAccountStatus.Suspended)
+                    {
+                        <span class="badge bg-danger fs-6">Suspended</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning fs-6">@Model.AccountStatus</span>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <span class="small text-muted d-block">Email:</span>
+                    <strong>@Model.Email</strong>
+                </div>
+
+                <div class="mb-3">
+                    <span class="small text-muted d-block">Phone:</span>
+                    <strong>@Model.PhoneNumber</strong>
+                </div>
+
+                <hr class="my-3">
+
+                <!-- Change Account Status Form -->
+                <form asp-action="UpdateUserStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="UserId" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Update Account Status</label>
+                        <select name="Status" class="form-select form-select-sm">
+                            <option value="1" selected="@(Model.AccountStatus == UserAccountStatus.Active)">Active</option>
+                            <option value="2" selected="@(Model.AccountStatus == UserAccountStatus.Suspended)">Suspended</option>
+                            <option value="3" selected="@(Model.AccountStatus == UserAccountStatus.Deactivated)">Deactivated</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Audit Reason <span class="text-danger">*</span></label>
+                        <input type="text" name="Reason" class="form-control form-control-sm" placeholder="Reason for status change" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-warning btn-sm w-100 fw-bold">
+                        Apply Status Update
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Side: Details, Verifications, Payments -->
+        <div class="col-lg-8">
+            <!-- Profile Overview -->
+            <div class="matrimony-card p-4 mb-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-person-badge text-primary me-2"></i>Profile Details</h5>
+                @if (Model.Profile != null)
+                {
+                    <div class="row g-2 small">
+                        <div class="col-sm-6"><span class="text-muted">Gender:</span> <strong>@Model.Profile.Gender</strong></div>
+                        <div class="col-sm-6"><span class="text-muted">Age / DOB:</span> <strong>@Model.Profile.Age yrs (@Model.Profile.DateOfBirth.ToString("yyyy-MM-dd"))</strong></div>
+                        <div class="col-sm-6"><span class="text-muted">Religion:</span> <strong>@Model.Profile.Religion</strong></div>
+                        <div class="col-sm-6"><span class="text-muted">Marital Status:</span> <strong>@Model.Profile.MaritalStatus</strong></div>
+                        <div class="col-sm-6"><span class="text-muted">Education:</span> <strong>@Model.Profile.HighestEducation (@Model.Profile.Institution)</strong></div>
+                        <div class="col-sm-6"><span class="text-muted">Occupation:</span> <strong>@Model.Profile.Occupation (@Model.Profile.Company)</strong></div>
+                        <div class="col-sm-6"><span class="text-muted">Location:</span> <strong>@Model.Profile.City, @Model.Profile.Division</strong></div>
+                        <div class="col-sm-6"><span class="text-muted">NID Verified:</span> <strong>@(Model.Profile.IsVerified ? "Yes" : "No")</strong></div>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted small mb-0">User has not created a detailed profile yet.</p>
+                }
+            </div>
+
+            <!-- NID Verification Records -->
+            <div class="matrimony-card p-4 mb-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-card-checklist text-primary me-2"></i>NID Verification History</h5>
+                @if (Model.Verifications.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle small mb-0">
+                            <thead>
+                                <tr>
+                                    <th>NID Number</th>
+                                    <th>Status</th>
+                                    <th>Submitted</th>
+                                    <th>Reviewed By</th>
+                                    <th>Reason / Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var v in Model.Verifications)
+                                {
+                                    <tr>
+                                        <td class="font-monospace fw-bold">@v.NidNumber</td>
+                                        <td>
+                                            @if (v.Status == NidVerificationStatus.Approved)
+                                            {
+                                                <span class="badge bg-success">Approved</span>
+                                            }
+                                            else if (v.Status == NidVerificationStatus.Pending)
+                                            {
+                                                <span class="badge bg-warning">Pending</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Rejected</span>
+                                            }
+                                        </td>
+                                        <td>@v.SubmittedAt.ToString("MMM dd, yyyy")</td>
+                                        <td>@(v.ReviewedByAdminName ?? "-")</td>
+                                        <td>@(v.RejectionReason ?? "-")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted small mb-0">No NID verification records submitted by this user.</p>
+                }
+            </div>
+
+            <!-- Payments Made By User -->
+            <div class="matrimony-card p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-credit-card text-primary me-2"></i>Transactions History</h5>
+                @if (Model.Payments.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle small mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Txn ID</th>
+                                    <th>Target Partner</th>
+                                    <th>Amount</th>
+                                    <th>Gateway</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in Model.Payments)
+                                {
+                                    <tr>
+                                        <td class="font-monospace">@p.TransactionId</td>
+                                        <td>@(p.TargetProfileName ?? "Candidate")</td>
+                                        <td>BDT @p.Amount.ToString("N2")</td>
+                                        <td>@p.Gateway</td>
+                                        <td><span class="badge bg-light text-dark border">@p.Status</span></td>
+                                        <td>@p.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted small mb-0">No payment transactions on record for this user.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

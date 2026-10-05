@@ -1,0 +1,90 @@
+@model PagedResult<PaymentHistoryDto>
+@{
+    ViewData["Title"] = "Payment & Transaction Monitoring - Admin";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="brand-font h3 fw-bold text-dark mb-1">Payment & Transaction Records</h1>
+            <p class="text-muted small">Complete financial audit log of contact unlock payments across Bangladesh gateways</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Overview</a>
+    </div>
+
+    <!-- Filter by Status -->
+    <div class="matrimony-card p-3 rounded-4 mb-4">
+        <form method="get" asp-action="Payments">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All Payment Statuses</option>
+                        <option value="1" selected="@(ViewBag.Status != null && (int)ViewBag.Status == 1)">Pending</option>
+                        <option value="2" selected="@(ViewBag.Status != null && (int)ViewBag.Status == 2)">Processing</option>
+                        <option value="3" selected="@(ViewBag.Status != null && (int)ViewBag.Status == 3)">Successful</option>
+                        <option value="4" selected="@(ViewBag.Status != null && (int)ViewBag.Status == 4)">Failed</option>
+                        <option value="5" selected="@(ViewBag.Status != null && (int)ViewBag.Status == 5)">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="matrimony-card p-4 rounded-4">
+        @if (Model.Items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Target Candidate</th>
+                            <th>Amount</th>
+                            <th>Gateway</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th>Completed Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Items)
+                        {
+                            <tr>
+                                <td class="font-monospace fw-bold">@p.TransactionId</td>
+                                <td>@(p.TargetProfileName ?? "Candidate")</td>
+                                <td class="fw-bold">@p.Currency @p.Amount.ToString("N2")</td>
+                                <td><span class="badge bg-light text-dark border">@p.Gateway</span></td>
+                                <td>
+                                    @if (p.Status == PaymentStatus.Successful)
+                                    {
+                                        <span class="badge bg-success-subtle text-success">Successful</span>
+                                    }
+                                    else if (p.Status == PaymentStatus.Pending || p.Status == PaymentStatus.Processing)
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning">Pending</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger">@p.Status</span>
+                                    }
+                                </td>
+                                <td>@p.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                                <td>@(p.CompletedAt?.ToString("MMM dd, yyyy HH:mm") ?? "-")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-credit-card-2-front display-3 opacity-50 mb-2"></i>
+                <h5>No Transaction Records Found</h5>
+            </div>
+        }
+    </div>
+</div>

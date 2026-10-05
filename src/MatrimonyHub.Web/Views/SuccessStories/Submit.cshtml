@@ -1,0 +1,66 @@
+@model CreateSuccessStoryDto
+@{
+    ViewData["Title"] = "Share Your Wedding Success Story";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="matrimony-card p-4 p-md-5 rounded-4">
+                <div class="text-center mb-4">
+                    <span class="badge px-3 py-2 rounded-pill bg-light text-primary mb-2 fw-semibold">Inspire Others</span>
+                    <h2 class="brand-font h3 fw-bold text-dark mb-1">Share Your Wedding Story</h2>
+                    <p class="text-muted small">Did you find your partner on Matrimony Hub? We would love to celebrate your story!</p>
+                </div>
+
+                <form asp-action="Submit" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="CoupleNames" class="form-label small fw-bold">Couple Names (e.g. Tanvir & Nusrat) <span class="text-danger">*</span></label>
+                        <input asp-for="CoupleNames" class="form-control" />
+                        <span asp-validation-for="CoupleNames" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="StoryTitle" class="form-label small fw-bold">Story Headline <span class="text-danger">*</span></label>
+                        <input asp-for="StoryTitle" class="form-control" placeholder="e.g. Found My Soulmate in Just 3 Months" />
+                        <span asp-validation-for="StoryTitle" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="MarriageDate" class="form-label small fw-bold">Marriage / Nikah Date <span class="text-danger">*</span></label>
+                            <input asp-for="MarriageDate" type="date" class="form-control" />
+                            <span asp-validation-for="MarriageDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Location" class="form-label small fw-bold">Wedding Location <span class="text-danger">*</span></label>
+                            <input asp-for="Location" class="form-control" placeholder="e.g. Dhaka, Bangladesh" />
+                            <span asp-validation-for="Location" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="StoryDescription" class="form-label small fw-bold">Your Story & Experience <span class="text-danger">*</span></label>
+                        <textarea asp-for="StoryDescription" class="form-control" rows="4" placeholder="How did you connect? What made you realize they were the one?"></textarea>
+                        <span asp-validation-for="StoryDescription" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">Wedding Photograph</label>
+                        <input type="file" name="Photo" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                        <span class="small text-muted" style="font-size: 0.75rem;">Upload a high quality photo of the bride and groom (JPG/PNG max 5MB)</span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary py-2 fs-6">
+                            <i class="bi bi-heart-fill text-danger me-1"></i> Submit Story
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

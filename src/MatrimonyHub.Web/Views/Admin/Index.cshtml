@@ -1,0 +1,141 @@
+@model AdminDashboardStatsDto
+@{
+    ViewData["Title"] = "Admin Governance Portal";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill small fw-bold mb-1">
+                <i class="bi bi-shield-lock-fill me-1"></i> Admin Portal
+            </span>
+            <h1 class="brand-font h3 fw-bold text-dark mb-0">Platform Overview & Metrics</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Verifications" class="btn btn-warning btn-sm fw-bold">
+                <i class="bi bi-hourglass-split me-1"></i> Pending NID (@Model.PendingNidVerifications)
+            </a>
+            <a asp-action="Logs" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-journal-text me-1"></i> Audit Logs
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-pills mb-4 bg-white p-2 rounded-3 border">
+        <li class="nav-item">
+            <a class="nav-link active fw-semibold" asp-action="Index"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link fw-semibold" asp-action="Users"><i class="bi bi-people-fill me-1"></i> User Management</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link fw-semibold position-relative" asp-action="Verifications">
+                <i class="bi bi-patch-check-fill me-1"></i> NID Verifications
+                @if (Model.PendingNidVerifications > 0)
+                {
+                    <span class="badge bg-danger ms-1">@Model.PendingNidVerifications</span>
+                }
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link fw-semibold" asp-action="Payments"><i class="bi bi-credit-card-fill me-1"></i> Transactions</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link fw-semibold" asp-action="Stories"><i class="bi bi-heart-fill me-1"></i> Success Stories</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link fw-semibold" asp-action="Logs"><i class="bi bi-shield-check me-1"></i> System Logs</a>
+        </li>
+    </ul>
+
+    <!-- Real Database Statistics Grid (Strictly NO Fake Numbers) -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="matrimony-card p-3 text-center">
+                <div class="small text-muted mb-1 text-uppercase fw-bold" style="font-size: 0.75rem;">Total Users</div>
+                <div class="h3 fw-bold text-dark mb-0">@Model.TotalUsers</div>
+                <span class="small text-muted">@Model.ActiveUsers Active</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="matrimony-card p-3 text-center">
+                <div class="small text-muted mb-1 text-uppercase fw-bold" style="font-size: 0.75rem;">NID Verified</div>
+                <div class="h3 fw-bold text-success mb-0">@Model.VerifiedUsers</div>
+                <span class="small text-muted">Government Checked</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="matrimony-card p-3 text-center">
+                <div class="small text-muted mb-1 text-uppercase fw-bold" style="font-size: 0.75rem;">Pending Verifications</div>
+                <div class="h3 fw-bold text-warning mb-0">@Model.PendingNidVerifications</div>
+                <span class="small text-muted">Awaiting Review</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="matrimony-card p-3 text-center">
+                <div class="small text-muted mb-1 text-uppercase fw-bold" style="font-size: 0.75rem;">Total Revenue</div>
+                <div class="h3 fw-bold text-primary mb-0">BDT @Model.TotalRevenue.ToString("N0")</div>
+                <span class="small text-muted">@Model.SuccessfulPayments Unlocks</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Registrations & Fast Actions -->
+    <div class="matrimony-card p-4 rounded-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Recent User Registrations</h5>
+            <a asp-action="Users" class="small text-primary fw-semibold">View All Users <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle small mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>NID Status</th>
+                        <th>Account Status</th>
+                        <th>Registered Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model.RecentRegistrations)
+                    {
+                        <tr>
+                            <td class="fw-bold">@u.FullName</td>
+                            <td>@u.Email</td>
+                            <td>@u.PhoneNumber</td>
+                            <td>
+                                @if (u.IsVerified)
+                                {
+                                    <span class="verified-badge"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary">Unverified</span>
+                                }
+                            </td>
+                            <td>
+                                @if (u.Status == UserAccountStatus.Active)
+                                {
+                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger">@u.Status</span>
+                                }
+                            </td>
+                            <td>@u.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                            <td>
+                                <a asp-action="UserDetail" asp-route-id="@u.Id" class="btn btn-sm btn-outline-primary py-0">Inspect</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

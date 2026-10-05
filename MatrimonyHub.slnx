@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MatrimonyHub.Application/MatrimonyHub.Application.csproj" />
+    <Project Path="src/MatrimonyHub.Domain/MatrimonyHub.Domain.csproj" />
+    <Project Path="src/MatrimonyHub.Infrastructure/MatrimonyHub.Infrastructure.csproj" />
+    <Project Path="src/MatrimonyHub.Web/MatrimonyHub.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MatrimonyHub.Tests/MatrimonyHub.Tests.csproj" />
+  </Folder>
+</Solution>

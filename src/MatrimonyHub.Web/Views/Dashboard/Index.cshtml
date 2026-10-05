@@ -1,0 +1,242 @@
+@{
+    ViewData["Title"] = "User Dashboard";
+    var profile = ViewBag.Profile as ProfileDetailDto;
+    var completion = (int)(ViewBag.CompletionScore ?? 0);
+    var verification = ViewBag.Verification as NidVerificationDetailDto;
+    var suggestions = ViewBag.Suggestions as List<ProfileCardDto> ?? new List<ProfileCardDto>();
+    var notifications = ViewBag.RecentNotifications as List<NotificationDto> ?? new List<NotificationDto>();
+    var payments = ViewBag.RecentPayments as List<PaymentHistoryDto> ?? new List<PaymentHistoryDto>();
+}
+
+<div class="container py-4">
+    <!-- Header Greeting & Profile Completion Bar -->
+    <div class="matrimony-card p-4 rounded-4 mb-4 bg-white">
+        <div class="row align-items-center g-3">
+            <div class="col-md-7">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; font-size: 1.5rem; font-weight: 700;">
+                        @(profile?.FullName?[..1].ToUpper() ?? "U")
+                    </div>
+                    <div>
+                        <h2 class="h4 fw-bold mb-1 d-flex align-items-center gap-2">
+                            Welcome, @(profile?.FullName ?? User.Identity?.Name)
+                            @if (profile?.IsVerified == true)
+                            {
+                                <span class="verified-badge"><i class="bi bi-patch-check-fill"></i> NID Verified</span>
+                            }
+                        </h2>
+                        <p class="text-muted small mb-0">Member since @(profile?.CreatedAt.ToString("MMMM yyyy") ?? "Recently") | Bangladesh</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="p-3 bg-light rounded-3 border">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small fw-bold text-dark">Profile Completion</span>
+                        <span class="small fw-bold text-primary">@completion%</span>
+                    </div>
+                    <div class="progress-completion mb-2">
+                        <div class="progress-bar" role="progressbar" style="width: @completion%;" aria-valuenow="@completion" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    @if (completion < 100)
+                    {
+                        <div class="text-end">
+                            <a asp-controller="Profile" asp-action="Edit" class="small text-primary text-decoration-none fw-semibold">
+                                Complete profile details <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards (Database Backed) -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <a asp-controller="Favorites" asp-action="Index" class="text-decoration-none">
+                <div class="matrimony-card p-3 h-100 text-center">
+                    <i class="bi bi-heart-fill text-danger fs-3 mb-1"></i>
+                    <div class="h4 fw-bold text-dark mb-0">@ViewBag.FavoritesCount</div>
+                    <div class="small text-muted">Favorite Profiles</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a asp-controller="Contact" asp-action="Unlocked" class="text-decoration-none">
+                <div class="matrimony-card p-3 h-100 text-center">
+                    <i class="bi bi-telephone-fill text-success fs-3 mb-1"></i>
+                    <div class="h4 fw-bold text-dark mb-0">@ViewBag.UnlockedCount</div>
+                    <div class="small text-muted">Unlocked Contacts</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a asp-controller="Verification" asp-action="Index" class="text-decoration-none">
+                <div class="matrimony-card p-3 h-100 text-center">
+                    @if (profile?.IsVerified == true)
+                    {
+                        <i class="bi bi-patch-check-fill text-success fs-3 mb-1"></i>
+                        <div class="h5 fw-bold text-success mb-0">Verified</div>
+                    }
+                    else if (verification?.Status == NidVerificationStatus.Pending)
+                    {
+                        <i class="bi bi-hourglass-split text-warning fs-3 mb-1"></i>
+                        <div class="h5 fw-bold text-warning mb-0">Under Review</div>
+                    }
+                    else
+                    {
+                        <i class="bi bi-shield-slash text-muted fs-3 mb-1"></i>
+                        <div class="h5 fw-bold text-muted mb-0">Unverified</div>
+                    }
+                    <div class="small text-muted">NID Status</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a asp-controller="Notifications" asp-action="Index" class="text-decoration-none">
+                <div class="matrimony-card p-3 h-100 text-center">
+                    <i class="bi bi-bell-fill text-primary fs-3 mb-1"></i>
+                    <div class="h4 fw-bold text-dark mb-0">@ViewBag.UnreadNotificationsCount</div>
+                    <div class="small text-muted">Unread Alerts</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Suggested Matches & Recent Notifications Row -->
+    <div class="row g-4 mb-4">
+        <!-- Suggested Matches -->
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h5 fw-bold mb-0 text-dark"><i class="bi bi-stars text-warning me-1"></i> Recommended For You</h4>
+                <a asp-controller="Matches" asp-action="Index" class="small text-primary fw-semibold text-decoration-none">View All <i class="bi bi-arrow-right"></i></a>
+            </div>
+
+            @if (suggestions.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var m in suggestions)
+                    {
+                        <div class="col-md-6">
+                            <div class="matrimony-card p-3 h-100 d-flex flex-column">
+                                <div class="d-flex gap-3 align-items-center mb-2">
+                                    <img src="@(string.IsNullOrEmpty(m.PrimaryPhotoUrl) ? (m.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg") : m.PrimaryPhotoUrl)" 
+                                         alt="@m.FullName" 
+                                         class="rounded-3" 
+                                         style="width: 70px; height: 70px; object-fit: cover;" />
+                                    <div>
+                                        <h6 class="fw-bold mb-0 text-dark">@m.FullName, @m.Age</h6>
+                                        <p class="small text-muted mb-1"><i class="bi bi-geo-alt-fill text-danger"></i> @m.City, @m.Division</p>
+                                        <span class="match-score-badge"><i class="bi bi-fire"></i> @m.MatchScore% Match</span>
+                                    </div>
+                                </div>
+                                <p class="small text-secondary mb-3 mt-1">
+                                    <i class="bi bi-briefcase me-1"></i> @m.Occupation <br />
+                                    <i class="bi bi-mortarboard me-1"></i> @m.HighestEducation
+                                </p>
+                                <div class="mt-auto d-flex gap-2">
+                                    <a asp-controller="Profile" asp-action="Details" asp-route-id="@m.Id" class="btn btn-outline-primary btn-sm flex-grow-1">
+                                        View Profile
+                                    </a>
+                                    @if (!m.IsContactUnlocked)
+                                    {
+                                        <a asp-controller="Payment" asp-action="Checkout" asp-route-targetProfileId="@m.Id" class="btn btn-primary btn-sm" title="Unlock Contact">
+                                            <i class="bi bi-telephone-fill"></i> Unlock
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="p-4 bg-white rounded-4 border text-center text-muted">
+                    <i class="bi bi-people display-4 text-muted opacity-50 mb-2"></i>
+                    <p class="small mb-2">No recommendations matching your current criteria yet.</p>
+                    <a asp-controller="Profile" asp-action="Preferences" class="btn btn-outline-primary btn-sm">Adjust Partner Preferences</a>
+                </div>
+            }
+        </div>
+
+        <!-- Recent Notifications -->
+        <div class="col-lg-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h5 fw-bold mb-0 text-dark"><i class="bi bi-bell me-1"></i> Recent Alerts</h4>
+                <a asp-controller="Notifications" asp-action="Index" class="small text-primary fw-semibold text-decoration-none">All</a>
+            </div>
+
+            <div class="matrimony-card p-3">
+                @if (notifications.Any())
+                {
+                    <div class="d-flex flex-column gap-2">
+                        @foreach (var n in notifications)
+                        {
+                            <div class="p-2 rounded-2 notification-item @(!n.IsRead ? "unread" : "")">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <strong class="small text-dark">@n.Title</strong>
+                                    <span class="text-muted" style="font-size: 0.7rem;">@n.CreatedAt.ToString("MMM dd")</span>
+                                </div>
+                                <p class="small text-muted mb-0 mt-1" style="font-size: 0.8rem;">@n.Message</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="small text-muted text-center py-4 mb-0">No new notifications.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Payments Table -->
+    @if (payments.Any())
+    {
+        <div class="matrimony-card p-4 rounded-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-credit-card-2-front me-2"></i>Recent Transactions</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Target Profile</th>
+                            <th>Amount</th>
+                            <th>Gateway</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in payments)
+                        {
+                            <tr>
+                                <td class="font-monospace fw-bold">@p.TransactionId</td>
+                                <td>@(p.TargetProfileName ?? "Partner Contact")</td>
+                                <td>@p.Currency @p.Amount.ToString("N2")</td>
+                                <td><span class="badge bg-light text-dark border">@p.Gateway</span></td>
+                                <td>
+                                    @if (p.Status == PaymentStatus.Successful)
+                                    {
+                                        <span class="badge bg-success-subtle text-success">Successful</span>
+                                    }
+                                    else if (p.Status == PaymentStatus.Pending || p.Status == PaymentStatus.Processing)
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning">Pending</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger">@p.Status</span>
+                                    }
+                                </td>
+                                <td>@p.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

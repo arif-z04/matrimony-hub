@@ -1,0 +1,279 @@
+@model UpdateProfileDto
+@{
+    ViewData["Title"] = "Manage My Profile";
+    var p = ViewBag.Profile as ProfileDetailDto;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="brand-font h3 fw-bold text-dark mb-1">Manage My Matrimonial Profile</h1>
+            <p class="text-muted small">Keep your profile updated with complete details to attract the most compatible life partners</p>
+        </div>
+        <a asp-action="Preferences" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-sliders me-1"></i> Edit Partner Preferences
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Photo Management Section -->
+        <div class="col-lg-4">
+            <div class="matrimony-card p-4 mb-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-camera me-2"></i>Profile Photos</h5>
+                
+                @if (p?.Photos.Any() == true)
+                {
+                    <div class="row g-2 mb-3">
+                        @foreach (var photo in p.Photos)
+                        {
+                            <div class="col-6 position-relative">
+                                <img src="@photo.PhotoUrl" alt="Photo" class="img-fluid rounded border w-100" style="height: 120px; object-fit: cover;" />
+                                @if (photo.IsPrimary)
+                                {
+                                    <span class="badge bg-primary position-absolute top-0 start-0 m-1 small">Primary</span>
+                                }
+                                <div class="position-absolute bottom-0 end-0 m-1 d-flex gap-1">
+                                    @if (!photo.IsPrimary)
+                                    {
+                                        <form asp-action="SetPrimaryPhoto" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="photoId" value="@photo.Id" />
+                                            <button type="submit" class="btn btn-light btn-sm p-1" title="Set as Primary">
+                                                <i class="bi bi-star"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    <form asp-action="DeletePhoto" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="photoId" value="@photo.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm p-1" title="Delete Photo" onclick="return confirm('Delete this photo?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if ((p?.Photos.Count ?? 0) < 6)
+                {
+                    <form asp-action="UploadPhoto" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Upload New Photo</label>
+                            <input type="file" name="File" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.webp" required />
+                            <span class="small text-muted" style="font-size: 0.75rem;">JPG, PNG up to 5MB. Max 6 photos.</span>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="SetAsPrimary" value="true" id="chkPrimary">
+                            <label class="form-check-label small" for="chkPrimary">Set as primary profile photo</label>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="bi bi-upload me-1"></i> Upload Photo
+                        </button>
+                    </form>
+                }
+            </div>
+
+            <!-- Identity Verification Card -->
+            <div class="matrimony-card p-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-patch-check-fill text-success fs-4"></i>
+                    <h5 class="fw-bold mb-0">NID Verification</h5>
+                </div>
+                @if (p?.IsVerified == true)
+                {
+                    <p class="small text-success fw-semibold mb-2">Your profile is verified with government NID.</p>
+                }
+                else
+                {
+                    <p class="small text-muted mb-3">Get your identity verified by uploading your Bangladeshi National ID.</p>
+                    <a asp-controller="Verification" asp-action="Index" class="btn btn-outline-success btn-sm w-100">
+                        Submit NID for Verification
+                    </a>
+                }
+            </div>
+        </div>
+
+        <!-- Profile Details Form -->
+        <div class="col-lg-8">
+            <div class="matrimony-card p-4 p-md-5">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-4"></div>
+
+                    <!-- 1. Basic Info -->
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">1. Basic Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="FullName" class="form-label small fw-bold">Full Name <span class="text-danger">*</span></label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <label asp-for="Gender" class="form-label small fw-bold">Gender</label>
+                            <select asp-for="Gender" class="form-select">
+                                <option value="1">Male</option>
+                                <option value="2">Female</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <label asp-for="DateOfBirth" class="form-label small fw-bold">Date of Birth</label>
+                            <input asp-for="DateOfBirth" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <label asp-for="HeightCm" class="form-label small fw-bold">Height (cm)</label>
+                            <input asp-for="HeightCm" type="number" class="form-control" placeholder="e.g. 175" />
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <label asp-for="WeightKg" class="form-label small fw-bold">Weight (kg)</label>
+                            <input asp-for="WeightKg" type="number" class="form-control" placeholder="e.g. 70" />
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <label asp-for="MaritalStatus" class="form-label small fw-bold">Marital Status</label>
+                            <select asp-for="MaritalStatus" class="form-select">
+                                <option value="1">Never Married</option>
+                                <option value="2">Divorced</option>
+                                <option value="3">Widowed</option>
+                                <option value="4">Awaiting Divorce</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <label asp-for="Religion" class="form-label small fw-bold">Religion</label>
+                            <select asp-for="Religion" class="form-select">
+                                <option value="1">Islam</option>
+                                <option value="2">Hinduism</option>
+                                <option value="3">Christianity</option>
+                                <option value="4">Buddhism</option>
+                                <option value="5">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 2. Education & Profession -->
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">2. Education & Career</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="HighestEducation" class="form-label small fw-bold">Highest Degree</label>
+                            <input asp-for="HighestEducation" class="form-control" placeholder="e.g. B.Sc, M.Sc, MBBS, MBA" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Subject" class="form-label small fw-bold">Field / Department</label>
+                            <input asp-for="Subject" class="form-control" placeholder="e.g. Computer Science, Medicine" />
+                        </div>
+                        <div class="col-md-8">
+                            <label asp-for="Institution" class="form-label small fw-bold">University / College</label>
+                            <input asp-for="Institution" class="form-control" placeholder="e.g. BUET, Dhaka University" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="GraduationYear" class="form-label small fw-bold">Graduation Year</label>
+                            <input asp-for="GraduationYear" type="number" class="form-control" placeholder="e.g. 2020" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Occupation" class="form-label small fw-bold">Profession</label>
+                            <input asp-for="Occupation" class="form-control" placeholder="e.g. Software Engineer, Doctor, Banker" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Company" class="form-label small fw-bold">Company / Organization</label>
+                            <input asp-for="Company" class="form-control" placeholder="e.g. Brain Station 23, Square Hospital" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="JobTitle" class="form-label small fw-bold">Job Title</label>
+                            <input asp-for="JobTitle" class="form-control" placeholder="e.g. Senior Software Engineer" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="IncomeRange" class="form-label small fw-bold">Income Range (Monthly)</label>
+                            <select asp-for="IncomeRange" class="form-select">
+                                <option value="">Confidential / Unspecified</option>
+                                <option value="Below 50K BDT">Below 50K BDT</option>
+                                <option value="50K - 1.0L BDT">50K - 1.0L BDT</option>
+                                <option value="1.0L - 1.5L BDT">1.0L - 1.5L BDT</option>
+                                <option value="1.5L - 2.5L BDT">1.5L - 2.5L BDT</option>
+                                <option value="Above 2.5L BDT">Above 2.5L BDT</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3. Location & Residence -->
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">3. Location</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label asp-for="Division" class="form-label small fw-bold">Division</label>
+                            <select asp-for="Division" class="form-select">
+                                <option value="">Select Division</option>
+                                <option value="Dhaka">Dhaka</option>
+                                <option value="Chittagong">Chittagong</option>
+                                <option value="Sylhet">Sylhet</option>
+                                <option value="Rajshahi">Rajshahi</option>
+                                <option value="Khulna">Khulna</option>
+                                <option value="Barisal">Barisal</option>
+                                <option value="Rangpur">Rangpur</option>
+                                <option value="Mymensingh">Mymensingh</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="District" class="form-label small fw-bold">District</label>
+                            <input asp-for="District" class="form-control" placeholder="e.g. Dhaka, Comilla, Sylhet" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="City" class="form-label small fw-bold">Area / City</label>
+                            <input asp-for="City" class="form-control" placeholder="e.g. Dhanmondi, Uttara, Agrabad" />
+                        </div>
+                    </div>
+
+                    <!-- 4. Lifestyle & Habits -->
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">4. Lifestyle & Hobbies</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label asp-for="DietaryPreference" class="form-label small fw-bold">Dietary Preference</label>
+                            <select asp-for="DietaryPreference" class="form-select">
+                                <option value="1">Any</option>
+                                <option value="2">Halal</option>
+                                <option value="3">Vegetarian</option>
+                                <option value="4">Non-Vegetarian</option>
+                                <option value="5">Vegan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center pt-3">
+                            <div class="form-check">
+                                <input asp-for="Smoking" class="form-check-input" type="checkbox" id="chkSmoking">
+                                <label class="form-check-label small" for="chkSmoking">Smoker</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center pt-3">
+                            <div class="form-check">
+                                <input asp-for="Drinking" class="form-check-input" type="checkbox" id="chkDrinking">
+                                <label class="form-check-label small" for="chkDrinking">Social Drinker</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Hobbies" class="form-label small fw-bold">Hobbies & Interests</label>
+                            <input asp-for="Hobbies" class="form-control" placeholder="e.g. Reading, Travel, Cooking, Gardening" />
+                        </div>
+                    </div>
+
+                    <!-- 5. About & Family Info -->
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">5. About Me & Family</h5>
+                    <div class="mb-3">
+                        <label asp-for="AboutMe" class="form-label small fw-bold">About Me</label>
+                        <textarea asp-for="AboutMe" class="form-control" rows="3" placeholder="Describe your personality, background, and life goals..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="FamilyInfo" class="form-label small fw-bold">Family Details</label>
+                        <textarea asp-for="FamilyInfo" class="form-control" rows="2" placeholder="Information about your parents, siblings, family background..."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="PartnerExpectations" class="form-label small fw-bold">Partner Expectations</label>
+                        <textarea asp-for="PartnerExpectations" class="form-control" rows="2" placeholder="What qualities do you look for in your future spouse?"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

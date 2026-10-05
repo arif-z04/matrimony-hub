@@ -1,0 +1,57 @@
+@model List<ProfileCardDto>
+@{
+    ViewData["Title"] = "Unlocked Partner Contacts";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="brand-font h3 fw-bold text-dark mb-1">My Unlocked Contacts</h1>
+            <p class="text-muted small">You have verified access to direct contact information for these matrimonial candidates</p>
+        </div>
+        <a asp-controller="Matches" asp-action="Index" class="btn btn-outline-primary btn-sm">Find More Matches</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var p in Model)
+            {
+                <div class="col-lg-6">
+                    <div class="matrimony-card p-4 h-100">
+                        <div class="d-flex gap-3 align-items-start">
+                            <img src="@(string.IsNullOrEmpty(p.PrimaryPhotoUrl) ? (p.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg") : p.PrimaryPhotoUrl)" 
+                                 alt="@p.FullName" 
+                                 class="rounded-3 shadow-sm" 
+                                 style="width: 100px; height: 100px; object-fit: cover;" />
+                            
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                    <h5 class="fw-bold text-dark mb-0">@p.FullName</h5>
+                                    <span class="badge bg-success-subtle text-success border border-success small"><i class="bi bi-check2-circle"></i> Unlocked</span>
+                                </div>
+                                <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> @p.City, @p.Division</p>
+                                <p class="small text-secondary mb-3">
+                                    <i class="bi bi-briefcase me-1"></i> @p.Occupation <br />
+                                    <i class="bi bi-mortarboard me-1"></i> @p.HighestEducation
+                                </p>
+                                <a asp-controller="Profile" asp-action="Details" asp-route-id="@p.Id" class="btn btn-outline-primary btn-sm">
+                                    View Complete Contact & Profile <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="matrimony-card p-5 text-center my-4">
+            <i class="bi bi-telephone-x display-2 text-muted opacity-50 mb-3"></i>
+            <h4 class="fw-bold mb-2">No Contacts Unlocked Yet</h4>
+            <p class="text-muted small mb-4">When you find a candidate you wish to contact, unlock their verified phone and email through our secure gateway.</p>
+            <a asp-controller="Matches" asp-action="Index" class="btn btn-primary px-4">Browse Compatible Matches</a>
+        </div>
+    }
+</div>

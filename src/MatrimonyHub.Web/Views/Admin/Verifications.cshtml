@@ -1,0 +1,101 @@
+@model List<NidVerificationDetailDto>
+@{
+    ViewData["Title"] = "Pending NID Verifications - Admin";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-warning text-dark px-3 py-1 rounded-pill small fw-bold mb-1">
+                <i class="bi bi-patch-check-fill me-1"></i> Identity Compliance Queue
+            </span>
+            <h1 class="brand-font h3 fw-bold text-dark mb-0">Pending NID Verifications</h1>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Overview</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var v in Model)
+            {
+                <div class="col-lg-6">
+                    <div class="matrimony-card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-baseline mb-2">
+                            <h5 class="fw-bold text-dark mb-0">@v.UserName</h5>
+                            <span class="badge bg-warning-subtle text-warning">Pending Review</span>
+                        </div>
+                        <p class="small text-muted mb-3">Email: @v.UserEmail | Submitted: @v.SubmittedAt.ToString("MMM dd, yyyy HH:mm")</p>
+
+                        <div class="p-3 bg-light rounded-3 border mb-3 small">
+                            <span class="text-muted d-block">Submitted National ID Number:</span>
+                            <strong class="fs-6 font-monospace text-primary">@v.NidNumber</strong>
+                        </div>
+
+                        <!-- Documents Preview -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <span class="small text-muted d-block mb-1">Front Document:</span>
+                                <a href="@v.FrontDocumentUrl" target="_blank" class="d-block border rounded p-1 text-center bg-white">
+                                    <img src="@v.FrontDocumentUrl" alt="Front Scan" class="img-fluid" style="max-height: 140px; object-fit: contain;" />
+                                    <div class="small text-primary mt-1"><i class="bi bi-box-arrow-up-right"></i> Open Full</div>
+                                </a>
+                            </div>
+                            @if (!string.IsNullOrEmpty(v.BackDocumentUrl))
+                            {
+                                <div class="col-6">
+                                    <span class="small text-muted d-block mb-1">Back Document:</span>
+                                    <a href="@v.BackDocumentUrl" target="_blank" class="d-block border rounded p-1 text-center bg-white">
+                                        <img src="@v.BackDocumentUrl" alt="Back Scan" class="img-fluid" style="max-height: 140px; object-fit: contain;" />
+                                        <div class="small text-primary mt-1"><i class="bi bi-box-arrow-up-right"></i> Open Full</div>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Moderation Actions -->
+                        <div class="d-flex gap-2 pt-2 border-top">
+                            <form asp-action="ReviewVerification" method="post" class="flex-grow-1">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="VerificationId" value="@v.Id" />
+                                <input type="hidden" name="Status" value="2" /> <!-- 2: Approved -->
+                                <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold" onclick="return confirm('Approve this NID verification?');">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Approve Verification
+                                </button>
+                            </form>
+
+                            <button type="button" class="btn btn-outline-danger btn-sm px-3" data-bs-toggle="collapse" data-bs-target="#rejectCollapse-@v.Id">
+                                <i class="bi bi-x-circle me-1"></i> Reject
+                            </button>
+                        </div>
+
+                        <!-- Collapsible Reject Form with Reason -->
+                        <div class="collapse mt-3" id="rejectCollapse-@v.Id">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <form asp-action="ReviewVerification" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="VerificationId" value="@v.Id" />
+                                    <input type="hidden" name="Status" value="3" /> <!-- 3: Rejected -->
+
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold text-dark">Reason for Rejection <span class="text-danger">*</span></label>
+                                        <input type="text" name="RejectionReason" class="form-control form-control-sm" placeholder="e.g. Document image is blurry or NID number mismatch" required />
+                                    </div>
+                                    <button type="submit" class="btn btn-danger btn-sm">Confirm Rejection</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="matrimony-card p-5 text-center my-4">
+            <i class="bi bi-check2-circle display-2 text-success mb-3"></i>
+            <h4 class="fw-bold mb-2">Queue is Empty</h4>
+            <p class="text-muted small">All submitted NID verifications have been reviewed and processed.</p>
+        </div>
+    }
+</div>

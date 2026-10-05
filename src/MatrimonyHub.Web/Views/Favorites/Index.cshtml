@@ -1,0 +1,75 @@
+@model List<ProfileCardDto>
+@{
+    ViewData["Title"] = "My Saved Favorites";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="brand-font h3 fw-bold text-dark mb-1">My Saved Favorites</h1>
+            <p class="text-muted small">Profiles you have bookmarked for matrimonial consideration</p>
+        </div>
+        <a asp-controller="Matches" asp-action="Index" class="btn btn-outline-primary btn-sm">Find More Matches</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var p in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="matrimony-card h-100 d-flex flex-column">
+                        <div class="profile-avatar-wrapper position-relative">
+                            <img src="@(string.IsNullOrEmpty(p.PrimaryPhotoUrl) ? (p.Gender == Gender.Female ? "https://randomuser.me/api/portraits/women/65.jpg" : "https://randomuser.me/api/portraits/men/65.jpg") : p.PrimaryPhotoUrl)" 
+                                 alt="@p.FullName" 
+                                 class="profile-avatar-img" />
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <form asp-action="Toggle" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="profileId" value="@p.Id" />
+                                    <button type="submit" class="btn btn-sm btn-light rounded-circle shadow-sm p-1 px-2 text-danger" title="Remove from Favorites">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="p-4 d-flex flex-column flex-grow-1">
+                            <h5 class="fw-bold mb-1 text-dark">@p.FullName, @p.Age</h5>
+                            <p class="small text-muted mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> @p.City, @p.Division</p>
+                            <p class="small text-secondary mb-3">
+                                <i class="bi bi-briefcase me-1"></i> @p.Occupation <br />
+                                <i class="bi bi-mortarboard me-1"></i> @p.HighestEducation
+                            </p>
+                            <div class="mt-auto d-flex gap-2">
+                                <a asp-controller="Profile" asp-action="Details" asp-route-id="@p.Id" class="btn btn-outline-primary btn-sm flex-grow-1">
+                                    View Profile
+                                </a>
+                                @if (p.IsContactUnlocked)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success d-flex align-items-center px-2 small">
+                                        <i class="bi bi-unlock-fill me-1"></i> Unlocked
+                                    </span>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Payment" asp-action="Checkout" asp-route-targetProfileId="@p.Id" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-telephone-fill me-1"></i> Unlock
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="matrimony-card p-5 text-center my-4">
+            <i class="bi bi-heart display-2 text-muted opacity-50 mb-3"></i>
+            <h4 class="fw-bold mb-2">You Have No Saved Favorites</h4>
+            <p class="text-muted small mb-4">When browsing matches, click the heart icon to save promising candidates here.</p>
+            <a asp-controller="Matches" asp-action="Index" class="btn btn-primary px-4">Browse Matches Now</a>
+        </div>
+    }
+</div>

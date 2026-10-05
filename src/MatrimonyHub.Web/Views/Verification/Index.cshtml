@@ -1,0 +1,107 @@
+@model NidSubmitDto
+@{
+    ViewData["Title"] = "National ID (NID) Verification";
+    var status = ViewBag.Status as NidVerificationDetailDto;
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Current Status Alert / Card -->
+            @if (status != null)
+            {
+                @if (status.Status == NidVerificationStatus.Approved)
+                {
+                    <div class="alert alert-success border-0 shadow-sm p-4 rounded-4 mb-4 d-flex align-items-start gap-3">
+                        <i class="bi bi-patch-check-fill fs-1 text-success"></i>
+                        <div>
+                            <h4 class="alert-heading fw-bold mb-1">Identity Verified Successfully</h4>
+                            <p class="small mb-1">
+                                Your National ID verification has been reviewed and approved. A verified badge is actively displayed on your matrimonial profile.
+                            </p>
+                            <span class="small text-muted">Masked NID: <strong>@status.NidNumber</strong> | Verified on: @status.ReviewedAt?.ToString("MMM dd, yyyy")</span>
+                        </div>
+                    </div>
+                }
+                else if (status.Status == NidVerificationStatus.Pending)
+                {
+                    <div class="alert alert-warning border-0 shadow-sm p-4 rounded-4 mb-4 d-flex align-items-start gap-3">
+                        <i class="bi bi-hourglass-split fs-1 text-warning"></i>
+                        <div>
+                            <h4 class="alert-heading fw-bold mb-1">Verification Under Review</h4>
+                            <p class="small mb-1">
+                                Your documents are currently being inspected by our compliance moderation team. This typically takes between 2 to 24 hours.
+                            </p>
+                            <span class="small text-muted">Submitted on: @status.SubmittedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                        </div>
+                    </div>
+                }
+                else if (status.Status == NidVerificationStatus.Rejected)
+                {
+                    <div class="alert alert-danger border-0 shadow-sm p-4 rounded-4 mb-4 d-flex align-items-start gap-3">
+                        <i class="bi bi-x-circle-fill fs-1 text-danger"></i>
+                        <div>
+                            <h4 class="alert-heading fw-bold mb-1">Verification Was Not Approved</h4>
+                            <p class="small mb-2">
+                                Reason provided by administrator: <strong>@status.RejectionReason</strong>
+                            </p>
+                            <span class="small text-muted">Please ensure your document is clearly legible and re-submit below.</span>
+                        </div>
+                    </div>
+                }
+            }
+
+            @if (status == null || status.Status == NidVerificationStatus.Rejected)
+            {
+                <div class="matrimony-card p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="bg-primary text-white rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-card-heading fs-3"></i>
+                        </div>
+                        <h2 class="brand-font h4 fw-bold mb-1">Government NID Verification</h2>
+                        <p class="text-muted small">
+                            Build trust and get up to 3x more responses by validating your identity with your Bangladeshi National ID card.
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 border mb-4 small">
+                        <h6 class="fw-bold text-dark mb-1"><i class="bi bi-shield-check text-primary me-1"></i> Privacy & Confidentiality Guarantee</h6>
+                        <p class="text-muted mb-0">
+                            Your NID number and document scans are strictly private. They will NEVER be published, shared with other members, or disclosed publicly.
+                        </p>
+                    </div>
+
+                    <form asp-action="Submit" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 small mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="NidNumber" class="form-label small fw-bold">National ID Number (10, 13, or 17 digits) <span class="text-danger">*</span></label>
+                            <input asp-for="NidNumber" class="form-control" placeholder="e.g. 19922691234567890" />
+                            <span asp-validation-for="NidNumber" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FrontDocument" class="form-label small fw-bold">Front Side of NID Card (Photo/Scan) <span class="text-danger">*</span></label>
+                            <input asp-for="FrontDocument" type="file" class="form-control" accept=".jpg,.jpeg,.png,.pdf" />
+                            <span asp-validation-for="FrontDocument" class="text-danger small"></span>
+                            <span class="text-muted small" style="font-size: 0.75rem;">Clear photo or scanned PDF up to 10MB</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="BackDocument" class="form-label small fw-bold">Back Side of NID Card (Optional for Smart Card)</label>
+                            <input asp-for="BackDocument" type="file" class="form-control" accept=".jpg,.jpeg,.png,.pdf" />
+                            <span asp-validation-for="BackDocument" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary py-2 fs-6">
+                                <i class="bi bi-shield-check me-1"></i> Submit For Administrative Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+</div>

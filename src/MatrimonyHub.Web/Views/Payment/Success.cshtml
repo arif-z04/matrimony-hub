@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Payment Successful";
+    var payment = ViewBag.Payment as Payment;
+}
+
+<div class="container py-5 text-center my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="matrimony-card p-5 rounded-4">
+                <i class="bi bi-check-circle-fill text-success display-2 mb-3"></i>
+                <h2 class="brand-font h3 fw-bold text-dark mb-2">Payment Completed Successfully!</h2>
+                <p class="text-muted small mb-4">
+                    Your transaction has been securely processed and contact details have been unlocked.
+                </p>
+
+                @if (payment != null)
+                {
+                    <div class="p-3 bg-light rounded-3 text-start small mb-4 border">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Transaction ID:</span>
+                            <span class="font-monospace fw-bold">@payment.TransactionId</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Amount Paid:</span>
+                            <span class="fw-bold">@payment.Currency @payment.Amount.ToString("N2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Gateway:</span>
+                            <span>@payment.Gateway</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Target Profile:</span>
+                            <span class="fw-bold">@(payment.TargetProfile?.FullName ?? "Partner Profile")</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3">
+                        @if (payment.TargetProfileId.HasValue)
+                        {
+                            <a asp-controller="Profile" asp-action="Details" asp-route-id="@payment.TargetProfileId" class="btn btn-primary px-4">
+                                <i class="bi bi-person-lines-fill me-1"></i> View Unlocked Contact Details
+                            </a>
+                        }
+                        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary px-4">Dashboard</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

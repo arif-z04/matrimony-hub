@@ -1,0 +1,105 @@
+@model PagedResult<AdminUserListDto>
+@{
+    ViewData["Title"] = "User Management - Admin";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="brand-font h3 fw-bold text-dark mb-1">User Directory & Status Management</h1>
+            <p class="text-muted small">Manage account standing, inspect user profiles, and monitor security status</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Overview</a>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="matrimony-card p-3 rounded-4 mb-4">
+        <form method="get" asp-action="Users">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Search by name, email, or phone..." value="@ViewBag.Search" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All Account Statuses</option>
+                        <option value="1" selected="@(ViewBag.Status != null && (int)ViewBag.Status == 1)">Active</option>
+                        <option value="2" selected="@(ViewBag.Status != null && (int)ViewBag.Status == 2)">Suspended</option>
+                        <option value="3" selected="@(ViewBag.Status != null && (int)ViewBag.Status == 3)">Deactivated</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex gap-2 justify-content-end">
+                    <a asp-action="Users" class="btn btn-outline-secondary btn-sm">Reset</a>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="matrimony-card p-4 rounded-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle small mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>NID Verified</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model.Items)
+                    {
+                        <tr>
+                            <td>@u.Id</td>
+                            <td class="fw-bold">@u.FullName</td>
+                            <td>@u.Email</td>
+                            <td>@u.PhoneNumber</td>
+                            <td>
+                                @if (u.IsVerified)
+                                {
+                                    <span class="verified-badge"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                                }
+                                else if (u.HasPendingVerification)
+                                {
+                                    <span class="pending-badge"><i class="bi bi-hourglass-split"></i> Pending NID</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary">None</span>
+                                }
+                            </td>
+                            <td>
+                                @if (u.AccountStatus == UserAccountStatus.Active)
+                                {
+                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                }
+                                else if (u.AccountStatus == UserAccountStatus.Suspended)
+                                {
+                                    <span class="badge bg-danger-subtle text-danger">Suspended</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning-subtle text-warning">@u.AccountStatus</span>
+                                }
+                            </td>
+                            <td>@u.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <a asp-action="UserDetail" asp-route-id="@u.Id" class="btn btn-sm btn-outline-primary py-0">
+                                    Manage
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

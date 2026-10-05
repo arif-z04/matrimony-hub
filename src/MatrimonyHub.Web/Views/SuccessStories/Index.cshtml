@@ -1,0 +1,55 @@
+@model List<SuccessStoryDto>
+@{
+    ViewData["Title"] = "Success Stories - Real Matrimonial Marriages";
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <span class="badge bg-light text-primary px-3 py-2 rounded-pill fw-semibold mb-2">Real Couples, True Stories</span>
+            <h1 class="brand-font h3 fw-bold text-dark mb-1">Matrimony Hub Success Stories</h1>
+            <p class="text-muted small mb-0">Discover genuine Bangladeshi couples who found their life partner through our verified platform</p>
+        </div>
+        <a asp-action="Submit" class="btn btn-primary btn-sm px-4">
+            <i class="bi bi-heart-fill me-1 text-danger"></i> Share Your Wedding Story
+        </a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var story in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="matrimony-card h-100 d-flex flex-column">
+                        @if (!string.IsNullOrEmpty(story.PhotoUrl))
+                        {
+                            <img src="@story.PhotoUrl" alt="@story.CoupleNames" class="w-100" style="height: 240px; object-fit: cover;" />
+                        }
+                        <div class="p-4 d-flex flex-column flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-light text-muted small"><i class="bi bi-geo-alt me-1"></i> @story.Location</span>
+                                <span class="small text-muted" style="font-size: 0.78rem;">@story.MarriageDate.ToString("MMMM yyyy")</span>
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-1">@story.CoupleNames</h5>
+                            <h6 class="small text-primary fw-bold mb-2">"@story.StoryTitle"</h6>
+                            <p class="small text-muted leading-relaxed mb-0">
+                                @story.StoryDescription
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="matrimony-card p-5 text-center my-4">
+            <i class="bi bi-heartbreak display-2 text-muted opacity-50 mb-3"></i>
+            <h4 class="fw-bold mb-2">No Success Stories Published Yet</h4>
+            <p class="text-muted small mb-3">Be the first couple to share your beautiful journey with our community!</p>
+            <a asp-action="Submit" class="btn btn-primary px-4">Submit Your Story</a>
+        </div>
+    }
+</div>

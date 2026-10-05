@@ -1,0 +1,54 @@
+@model PagedResult<AdminLogDto>
+@{
+    ViewData["Title"] = "System Audit Logs - Admin";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="brand-font h3 fw-bold text-dark mb-1">Administrative Audit Trail</h1>
+            <p class="text-muted small">Chronological ledger of security events, status modifications, and verification decisions</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Overview</a>
+    </div>
+
+    <div class="matrimony-card p-4 rounded-4">
+        @if (Model.Items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Admin</th>
+                            <th>Action</th>
+                            <th>Entity Type</th>
+                            <th>Description</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in Model.Items)
+                        {
+                            <tr>
+                                <td style="white-space: nowrap;">@log.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td class="fw-semibold">@(log.AdminName ?? "System")</td>
+                                <td><span class="badge bg-light text-dark border">@log.Action</span></td>
+                                <td>@log.EntityType</td>
+                                <td>@log.Description</td>
+                                <td class="font-monospace small text-muted">@(log.IpAddress ?? "127.0.0.1")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-journal-text display-3 opacity-50 mb-2"></i>
+                <h5>No Logs Recorded</h5>
+            </div>
+        }
+    </div>
+</div>
