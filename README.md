@@ -202,7 +202,8 @@ The test suite validates:
 
 ## 10. Production Deployment Guidelines
 
-1. **Enforce HTTPS**: Set `app.UseHsts()` and enforce TLS 1.3 reverse proxy via NGINX or Cloudflare.
-2. **Secrets Management**: Store connection strings and payment merchant credentials using environment variables or Azure Key Vault / HashiCorp Vault. Never commit secrets to source control.
-3. **Database Performance**: Ensure MySQL `innodb_buffer_pool_size` is sized appropriately (e.g. 70–80% of dedicated RAM).
-4. **File Storage**: In scalable multi-server deployments, swap `FileStorageService` with an S3 / Azure Blob Storage provider.
+1. **Cloudflare Deployment**: For complete step-by-step instructions on hosting Matrimony Hub using **Cloudflare Tunnel (Zero Trust)** or **Cloudflare Reverse Proxy (Strict SSL, CDN Caching & WAF)**, see 👉 **[`docs/cloudflare_hosting.md`](docs/cloudflare_hosting.md)**.
+2. **Enforce HTTPS**: Set `app.UseHsts()` and enforce TLS 1.3 reverse proxy via Cloudflare / Nginx.
+3. **Secrets Management**: Store connection strings and payment merchant credentials using environment variables or Azure Key Vault / HashiCorp Vault. Never commit secrets to source control.
+4. **Database Performance**: Ensure MySQL `innodb_buffer_pool_size` is sized appropriately (e.g. 70–80% of dedicated RAM).
+5. **File Storage**: In scalable multi-server deployments, swap `FileStorageService` with an S3 / Cloudflare R2 / Azure Blob Storage provider.

@@ -1,10 +1,19 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using MatrimonyHub.Domain.Entities;
 using MatrimonyHub.Infrastructure;
 using MatrimonyHub.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Forwarded Headers for Cloudflare / Reverse Proxies
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // Add Infrastructure & EF Core with MySQL
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -79,6 +88,7 @@ else
 
 app.UseStatusCodePagesWithReExecute("/Home/Error/{0}");
 
+app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
