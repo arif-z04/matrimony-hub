@@ -31,6 +31,13 @@ public class PaymentController : BaseController
     [HttpGet]
     public async Task<IActionResult> Checkout(int targetProfileId)
     {
+        var myProfile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == CurrentUserId!.Value);
+        if (myProfile == null || !myProfile.IsVerified)
+        {
+            TempData["ErrorMessage"] = "Identity Verification Required: Your profile must be verified via National ID (NID) before you can initiate payment or unlock contact details.";
+            return RedirectToAction("Index", "Verification");
+        }
+
         var profileRes = await _profileService.GetProfileByIdAsync(targetProfileId, CurrentUserId);
         if (!profileRes.Succeeded || profileRes.Data == null) return NotFound();
 
@@ -57,6 +64,13 @@ public class PaymentController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Initiate(InitiatePaymentDto model)
     {
+        var myProfile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == CurrentUserId!.Value);
+        if (myProfile == null || !myProfile.IsVerified)
+        {
+            TempData["ErrorMessage"] = "Identity Verification Required: Your profile must be verified via National ID (NID) before you can initiate payment or unlock contact details.";
+            return RedirectToAction("Index", "Verification");
+        }
+
         if (!ModelState.IsValid)
         {
             return RedirectToAction("Checkout", new { targetProfileId = model.TargetProfileId });

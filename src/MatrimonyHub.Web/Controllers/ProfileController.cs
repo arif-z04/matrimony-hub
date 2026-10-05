@@ -26,6 +26,18 @@ public class ProfileController : BaseController
         }
 
         ViewBag.UnlockFee = await _contactAccessService.GetContactUnlockFeeAsync();
+
+        bool isCurrentUserVerified = false;
+        if (CurrentUserId.HasValue)
+        {
+            var myProfile = await _profileService.GetProfileByUserIdAsync(CurrentUserId.Value, CurrentUserId.Value);
+            if (myProfile.Succeeded && myProfile.Data != null)
+            {
+                isCurrentUserVerified = myProfile.Data.IsVerified;
+            }
+        }
+        ViewBag.IsCurrentUserVerified = isCurrentUserVerified;
+
         return View(result.Data);
     }
 

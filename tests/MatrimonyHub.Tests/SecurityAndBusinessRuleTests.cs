@@ -96,7 +96,22 @@ public class SecurityAndBusinessRuleTests
             Country = "Bangladesh",
             IsActive = true
         };
-        db.UserProfiles.Add(candidateProfile);
+        var viewerProfile = new UserProfile
+        {
+            Id = 99,
+            UserId = viewerUser.Id,
+            User = viewerUser,
+            FullName = "Viewer User",
+            Gender = Gender.Male,
+            DateOfBirth = DateTime.UtcNow.AddYears(-27),
+            City = "Gulshan",
+            District = "Dhaka",
+            Division = "Dhaka",
+            Country = "Bangladesh",
+            IsActive = true,
+            IsVerified = true
+        };
+        db.UserProfiles.AddRange(candidateProfile, viewerProfile);
 
         // Simulate successful payment & unlock record
         var payment = new Payment
@@ -309,5 +324,141 @@ public class SecurityAndBusinessRuleTests
         perfectScore.Should().BeGreaterThan(80, "A well-matched partner should have a high score");
         mismatchScore.Should().BeLessThan(40, "A mismatched partner should have a low score");
         perfectScore.Should().BeGreaterThan(mismatchScore);
+    }
+
+    [Fact]
+    public async Task UnverifiedUserCannotInitiatePaymentOrUnlockContact()
+    {
+        // Arrange
+        using var db = CreateInMemoryDbContext();
+        var unverifiedUser = new ApplicationUser { Id = 31, FullName = "Unverified User", Email = "unverified@example.com" };
+        var candidateUser = new ApplicationUser { Id = 32, FullName = "Candidate User", Email = "candidate2@example.com", PhoneNumber = "01811223344" };
+        db.Users.AddRange(unverifiedUser, candidateUser);
+
+        var unverifiedProfile = new UserProfile
+        {
+            Id = 201,
+            UserId = unverifiedUser.Id,
+            User = unverifiedUser,
+            FullName = "Unverified User",
+            Gender = Gender.Male,
+            DateOfBirth = DateTime.UtcNow.AddYears(-28),
+            IsActive = true,
+            IsVerified = false // NOT verified!
+        };
+
+        var candidateProfile = new UserProfile
+        {
+            Id = 202,
+            UserId = candidateUser.Id,
+            User = candidateUser,
+            FullName = "Candidate User",
+            Gender = Gender.Female,
+            DateOfBirth = DateTime.UtcNow.AddYears(-24),
+            IsActive = true,
+            IsVerified = true
+        };
+        db.UserProfiles.AddRange(unverifiedProfile, candidateProfile);
+        await db.SaveChangesAsync();
+
+        var paymentOptions = Options.Create(new PaymentGatewayOptions { ContactUnlockFee = 500m });
+        var contactAccessService = new ContactAccessService(db, paymentOptions);
+        var mockGateway = new Mock<IPaymentGateway>();
+        mockGateway.Setup(g => g.GatewayType).Returns(PaymentGateway.Sandbox);
+        mockGateway.Setup(g => g.InitiatePaymentAsync(It.IsAny<Payment>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(new PaymentResultDto { IsSuccess = true, CheckoutUrl = "https://example.com/checkout" });
+
+        var paymentService = new PaymentService(
+            db,
+            new[] { mockGateway.Object },
+            contactAccessService,
+            new Mock<INotificationService>().Object,
+            new Mock<IEmailService>().Object,
+            paymentOptions,
+            NullLogger<PaymentService>.Instance);
+
+        // Act 1: Attempt to initiate payment
+        var initResult = await paymentService.InitiateContactUnlockPaymentAsync(
+            unverifiedUser.Id, candidateProfile.Id, PaymentGateway.Sandbox, "https://return.test", "https://cancel.test");
+
+        // Act 2: Attempt direct unlock
+        var unlockResult = await contactAccessService.UnlockContactAsync(unverifiedUser.Id, candidateProfile.Id, 999);
+
+        // Act 3: Check contact access
+        var hasAccess = await contactAccessService.HasAccessAsync(unverifiedUser.Id, candidateProfile.Id);
+
+        // Assert
+        initResult.Succeeded.Should().BeFalse();
+        initResult.Message.Should().Contain("Identity Verification Required");
+        unlockResult.Succeeded.Should().BeFalse();
+        unlockResult.Message.Should().Contain("Identity Verification Required");
+        hasAccess.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task UnverifiedUserCannotViewContactInfoEvenWithPriorPaymentRecord()
+    {
+        // Arrange
+        using var db = CreateInMemoryDbContext();
+        var user = new ApplicationUser { Id = 41, FullName = "Revoked User", Email = "revoked@example.com" };
+        var candidateUser = new ApplicationUser { Id = 42, FullName = "Candidate User 3", Email = "target3@example.com", PhoneNumber = "01999887766" };
+        db.Users.AddRange(user, candidateUser);
+
+        var profile = new UserProfile
+        {
+            Id = 301,
+            UserId = user.Id,
+            User = user,
+            FullName = "Revoked User",
+            Gender = Gender.Male,
+            DateOfBirth = DateTime.UtcNow.AddYears(-30),
+            IsActive = true,
+            IsVerified = false // Unverified or verification revoked
+        };
+
+        var candidateProfile = new UserProfile
+        {
+            Id = 302,
+            UserId = candidateUser.Id,
+            User = candidateUser,
+            FullName = "Candidate User 3",
+            Gender = Gender.Female,
+            DateOfBirth = DateTime.UtcNow.AddYears(-26),
+            City = "Uttara",
+            District = "Dhaka",
+            Division = "Dhaka",
+            Country = "Bangladesh",
+            IsActive = true,
+            IsVerified = true
+        };
+        db.UserProfiles.AddRange(profile, candidateProfile);
+
+        // Existing ContactAccess record in DB
+        db.ContactAccesses.Add(new ContactAccess
+        {
+            Id = 55,
+            UserId = user.Id,
+            TargetProfileId = candidateProfile.Id,
+            PaymentId = 999,
+            UnlockedAt = DateTime.UtcNow.AddDays(-1)
+        });
+        await db.SaveChangesAsync();
+
+        var paymentOptions = Options.Create(new PaymentGatewayOptions { ContactUnlockFee = 500m });
+        var contactAccessService = new ContactAccessService(db, paymentOptions);
+        var fileStorageMock = new Mock<IFileStorageService>();
+        var profileService = new ProfileService(db, fileStorageMock.Object, contactAccessService, NullLogger<ProfileService>.Instance);
+
+        // Act
+        var hasAccess = await contactAccessService.HasAccessAsync(user.Id, candidateProfile.Id);
+        var profileResult = await profileService.GetProfileByIdAsync(candidateProfile.Id, requestingUserId: user.Id);
+
+        // Assert
+        hasAccess.Should().BeFalse();
+        profileResult.Succeeded.Should().BeTrue();
+        profileResult.Data!.IsContactUnlocked.Should().BeFalse();
+        profileResult.Data.ContactPhone.Should().BeNull();
+        profileResult.Data.ContactEmail.Should().BeNull();
+        profileResult.Data.ContactAddress.Should().BeNull();
     }
 }

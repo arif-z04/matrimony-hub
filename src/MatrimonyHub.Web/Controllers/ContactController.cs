@@ -26,6 +26,13 @@ public class ContactController : BaseController
     [HttpGet]
     public async Task<IActionResult> Unlock(int profileId)
     {
+        var myProfile = await _profileService.GetProfileByUserIdAsync(CurrentUserId!.Value, CurrentUserId.Value);
+        if (!myProfile.Succeeded || myProfile.Data == null || !myProfile.Data.IsVerified)
+        {
+            TempData["ErrorMessage"] = "Identity Verification Required: Your profile must be verified via National ID (NID) before you can unlock contact information.";
+            return RedirectToAction("Index", "Verification");
+        }
+
         // Check if already unlocked
         var hasAccess = await _contactAccessService.HasAccessAsync(CurrentUserId!.Value, profileId);
         if (hasAccess)

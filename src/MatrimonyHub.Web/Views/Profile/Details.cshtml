@@ -96,16 +96,31 @@
                         </div>
                         <h6 class="fw-bold text-dark mb-1">Contact Details are Protected</h6>
                         <p class="small text-muted mb-3">
-                            To ensure privacy and avoid spam, direct phone and email details are unlocked exclusively via payment.
+                            To ensure candidate privacy and trust, direct phone and email details are unlocked exclusively via payment by verified members.
                         </p>
                         <div class="p-2 bg-light rounded-2 small mb-3 border">
                             Unlock Fee: <strong>BDT @unlockFee.ToString("N2")</strong>
                         </div>
-                        <div class="d-grid">
-                            <a asp-controller="Payment" asp-action="Checkout" asp-route-targetProfileId="@Model.Id" class="btn btn-primary btn-sm py-2">
-                                <i class="bi bi-credit-card me-1"></i> Unlock Contact Information
-                            </a>
-                        </div>
+                        @if (User.Identity?.IsAuthenticated == true && (ViewBag.IsCurrentUserVerified != true))
+                        {
+                            <div class="alert alert-warning py-2 px-3 small text-start mb-3 border-0 bg-warning-subtle text-dark">
+                                <i class="bi bi-shield-exclamation text-warning me-1"></i>
+                                <strong>NID Verification Required:</strong> Your profile must be verified before you can unlock contact info.
+                            </div>
+                            <div class="d-grid">
+                                <a asp-controller="Verification" asp-action="Index" class="btn btn-warning btn-sm py-2 fw-semibold">
+                                    <i class="bi bi-shield-check me-1"></i> Verify Your Profile to Unlock
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-grid">
+                                <a asp-controller="Payment" asp-action="Checkout" asp-route-targetProfileId="@Model.Id" class="btn btn-primary btn-sm py-2">
+                                    <i class="bi bi-credit-card me-1"></i> Unlock Contact Information
+                                </a>
+                            </div>
+                        }
                     </div>
                 }
             </div>

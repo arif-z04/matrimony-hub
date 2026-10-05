@@ -52,6 +52,14 @@ public class PaymentService : IPaymentService
         if (targetProfile.UserId == userId)
             return ServiceResult<PaymentResultDto>.Failure("You cannot purchase contact details for your own profile.");
 
+        // Verify that the buyer's profile exists and is NID verified
+        var buyerProfile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+        if (buyerProfile == null || !buyerProfile.IsVerified)
+        {
+            return ServiceResult<PaymentResultDto>.Failure(
+                "Identity Verification Required: You must verify your National ID (NID) before you can initiate payment or unlock contact details.");
+        }
+
         // Check if already unlocked
         var alreadyUnlocked = await _contactAccessService.HasAccessAsync(userId, targetProfileId);
         if (alreadyUnlocked)
@@ -143,6 +151,17 @@ public class PaymentService : IPaymentService
 
                 if (callbackDto.Status == PaymentStatus.Successful)
                 {
+                    // Strict verification check: buyer must be verified to complete contact unlock payment
+                    var buyerProfile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == payment.UserId);
+                    if (buyerProfile == null || !buyerProfile.IsVerified)
+                    {
+                        payment.Status = PaymentStatus.Failed;
+                        payment.FailureReason = "Identity verification required: User profile is not NID verified.";
+                        await _db.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        return ServiceResult<bool>.Failure("Payment failed: Profile must be verified via National ID (NID) to unlock contacts.");
+                    }
+
                     payment.Status = PaymentStatus.Successful;
                     payment.FailureReason = null;
                     await _db.SaveChangesAsync();

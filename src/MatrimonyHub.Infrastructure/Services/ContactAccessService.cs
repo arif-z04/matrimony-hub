@@ -28,12 +28,25 @@ public class ContactAccessService : IContactAccessService
         if (profile == null) return false;
         if (profile.UserId == userId) return true;
 
+        // An unverified user cannot view contact info of others
+        var viewerProfile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+        if (viewerProfile == null || !viewerProfile.IsVerified)
+        {
+            return false;
+        }
+
         // 2. Check existing access record in DB
         return await _db.ContactAccesses.AnyAsync(c => c.UserId == userId && c.TargetProfileId == targetProfileId);
     }
 
     public async Task<ServiceResult> UnlockContactAsync(int userId, int targetProfileId, int paymentId)
     {
+        var viewerProfile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+        if (viewerProfile == null || !viewerProfile.IsVerified)
+        {
+            return ServiceResult.Failure("Identity Verification Required: You must verify your National ID (NID) before you can unlock contact details.");
+        }
+
         // Verify payment is successful and matches target profile
         var payment = await _db.Payments.FirstOrDefaultAsync(p => p.Id == paymentId && p.UserId == userId);
         if (payment == null)
@@ -68,6 +81,12 @@ public class ContactAccessService : IContactAccessService
 
     public async Task<List<ProfileCardDto>> GetUnlockedProfilesAsync(int userId)
     {
+        var viewerProfile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+        if (viewerProfile == null || !viewerProfile.IsVerified)
+        {
+            return new List<ProfileCardDto>();
+        }
+
         var accesses = await _db.ContactAccesses
             .Where(c => c.UserId == userId)
             .Include(c => c.TargetProfile)
