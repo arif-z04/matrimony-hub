@@ -25,6 +25,16 @@ public class SecurityAndBusinessRuleTests
     }
 
     [Fact]
+    public void AdminPasswordHashIsValid()
+    {
+        var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<ApplicationUser>();
+        var user = new ApplicationUser { UserName = "admin@matrimonyhub.com" };
+        var adminHash = "AQAAAAIAAYagAAAAEGGkBkSYdUINgqFZdEF89tlIVedpIxd5FuG4/irKuKUvQeJlk8nRpaVfaSqB4TwNOQ==";
+        var result = hasher.VerifyHashedPassword(user, adminHash, "Admin@Pass123!");
+        result.Should().Be(Microsoft.AspNetCore.Identity.PasswordVerificationResult.Success);
+    }
+
+    [Fact]
     public async Task UserCannotAccessContactInfoWithoutSuccessfulPayment()
     {
         // Arrange

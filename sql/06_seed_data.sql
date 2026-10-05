@@ -23,9 +23,9 @@ INSERT INTO `Users` (
     `AccessFailedCount`, `FullName`, `AccountStatus`, `CreatedAt`, `IsDeleted`
 ) VALUES (
     1, 'admin@matrimonyhub.com', 'ADMIN@MATRIMONYHUB.COM', 'admin@matrimonyhub.com', 'ADMIN@MATRIMONYHUB.COM',
-    1, 'AQAAAAIAAYagAAAAEP0wT5p9wUeS72l1o7uA98q1c6v5b4a3Z2y1x0w9v8u7t6s5r4q3p2o1n0m9l8k7j==', 'SECSTAMP001', 'CONCSTAMP001',
+    1, 'AQAAAAIAAYagAAAAEGGkBkSYdUINgqFZdEF89tlIVedpIxd5FuG4/irKuKUvQeJlk8nRpaVfaSqB4TwNOQ==', 'SECSTAMP001', 'CONCSTAMP001',
     '01700000001', 1, 0, 1, 0, 'System Administrator', 1, '2025-01-01 00:00:00', 0
-) ON DUPLICATE KEY UPDATE `FullName` = VALUES(`FullName`);
+) ON DUPLICATE KEY UPDATE `PasswordHash` = VALUES(`PasswordHash`), `FullName` = VALUES(`FullName`);
 
 INSERT INTO `UserRoles` (`UserId`, `RoleId`) VALUES (1, 1)
 ON DUPLICATE KEY UPDATE `RoleId` = VALUES(`RoleId`);
@@ -37,12 +37,12 @@ INSERT INTO `Users` (
     `PhoneNumber`, `PhoneNumberConfirmed`, `TwoFactorEnabled`, `LockoutEnabled`, 
     `AccessFailedCount`, `FullName`, `AccountStatus`, `CreatedAt`, `IsDeleted`
 ) VALUES 
-(2, 'tanvir.ahmed@example.com', 'TANVIR.AHMED@EXAMPLE.COM', 'tanvir.ahmed@example.com', 'TANVIR.AHMED@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEP0wT5p9wUeS72l1o7uA98q1c6v5b4a3Z2y1x0w9v8u7t6s5r4q3p2o1n0m9l8k7j==', 'SECSTAMP002', 'CONCSTAMP002', '01711223344', 1, 0, 1, 0, 'Tanvir Ahmed', 1, '2025-02-01 10:00:00', 0),
-(3, 'nusrat.jahan@example.com', 'NUSRAT.JAHAN@EXAMPLE.COM', 'nusrat.jahan@example.com', 'NUSRAT.JAHAN@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEP0wT5p9wUeS72l1o7uA98q1c6v5b4a3Z2y1x0w9v8u7t6s5r4q3p2o1n0m9l8k7j==', 'SECSTAMP003', 'CONCSTAMP003', '01811223344', 1, 0, 1, 0, 'Nusrat Jahan', 1, '2025-02-05 11:30:00', 0),
-(4, 'rahim.chowdhury@example.com', 'RAHIM.CHOWDHURY@EXAMPLE.COM', 'rahim.chowdhury@example.com', 'RAHIM.CHOWDHURY@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEP0wT5p9wUeS72l1o7uA98q1c6v5b4a3Z2y1x0w9v8u7t6s5r4q3p2o1n0m9l8k7j==', 'SECSTAMP004', 'CONCSTAMP004', '01911223344', 1, 0, 1, 0, 'Rahim Chowdhury', 1, '2025-02-10 14:15:00', 0),
-(5, 'sadia.islam@example.com', 'SADIA.ISLAM@EXAMPLE.COM', 'sadia.islam@example.com', 'SADIA.ISLAM@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEP0wT5p9wUeS72l1o7uA98q1c6v5b4a3Z2y1x0w9v8u7t6s5r4q3p2o1n0m9l8k7j==', 'SECSTAMP005', 'CONCSTAMP005', '01722334455', 1, 0, 1, 0, 'Sadia Islam', 1, '2025-02-15 16:45:00', 0),
-(6, 'kazi.farhan@example.com', 'KAZI.FARHAN@EXAMPLE.COM', 'kazi.farhan@example.com', 'KAZI.FARHAN@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEP0wT5p9wUeS72l1o7uA98q1c6v5b4a3Z2y1x0w9v8u7t6s5r4q3p2o1n0m9l8k7j==', 'SECSTAMP006', 'CONCSTAMP006', '01822334455', 1, 0, 1, 0, 'Kazi Farhan', 1, '2025-03-01 09:20:00', 0),
-(7, 'anika.tabassum@example.com', 'ANIKA.TABASSUM@EXAMPLE.COM', 'anika.tabassum@example.com', 'ANIKA.TABASSUM@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEP0wT5p9wUeS72l1o7uA98q1c6v5b4a3Z2y1x0w9v8u7t6s5r4q3p2o1n0m9l8k7j==', 'SECSTAMP007', 'CONCSTAMP007', '01922334455', 1, 0, 1, 0, 'Anika Tabassum', 1, '2025-03-05 12:10:00', 0)
+(2, 'tanvir.ahmed@example.com', 'TANVIR.AHMED@EXAMPLE.COM', 'tanvir.ahmed@example.com', 'TANVIR.AHMED@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEOcu4VWltFI5oTE9TH1DIj0zcKDDKXJcffpZ3ht5lVktKx+WqTyq/KXYEPXqXzzFOw==', 'SECSTAMP002', 'CONCSTAMP002', '01711223344', 1, 0, 1, 0, 'Tanvir Ahmed', 1, '2025-02-01 10:00:00', 0),
+(3, 'nusrat.jahan@example.com', 'NUSRAT.JAHAN@EXAMPLE.COM', 'nusrat.jahan@example.com', 'NUSRAT.JAHAN@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEOcu4VWltFI5oTE9TH1DIj0zcKDDKXJcffpZ3ht5lVktKx+WqTyq/KXYEPXqXzzFOw==', 'SECSTAMP003', 'CONCSTAMP003', '01811223344', 1, 0, 1, 0, 'Nusrat Jahan', 1, '2025-02-05 11:30:00', 0),
+(4, 'rahim.chowdhury@example.com', 'RAHIM.CHOWDHURY@EXAMPLE.COM', 'rahim.chowdhury@example.com', 'RAHIM.CHOWDHURY@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEOcu4VWltFI5oTE9TH1DIj0zcKDDKXJcffpZ3ht5lVktKx+WqTyq/KXYEPXqXzzFOw==', 'SECSTAMP004', 'CONCSTAMP004', '01911223344', 1, 0, 1, 0, 'Rahim Chowdhury', 1, '2025-02-10 14:15:00', 0),
+(5, 'sadia.islam@example.com', 'SADIA.ISLAM@EXAMPLE.COM', 'sadia.islam@example.com', 'SADIA.ISLAM@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEOcu4VWltFI5oTE9TH1DIj0zcKDDKXJcffpZ3ht5lVktKx+WqTyq/KXYEPXqXzzFOw==', 'SECSTAMP005', 'CONCSTAMP005', '01722334455', 1, 0, 1, 0, 'Sadia Islam', 1, '2025-02-15 16:45:00', 0),
+(6, 'kazi.farhan@example.com', 'KAZI.FARHAN@EXAMPLE.COM', 'kazi.farhan@example.com', 'KAZI.FARHAN@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEOcu4VWltFI5oTE9TH1DIj0zcKDDKXJcffpZ3ht5lVktKx+WqTyq/KXYEPXqXzzFOw==', 'SECSTAMP006', 'CONCSTAMP006', '01822334455', 1, 0, 1, 0, 'Kazi Farhan', 1, '2025-03-01 09:20:00', 0),
+(7, 'anika.tabassum@example.com', 'ANIKA.TABASSUM@EXAMPLE.COM', 'anika.tabassum@example.com', 'ANIKA.TABASSUM@EXAMPLE.COM', 1, 'AQAAAAIAAYagAAAAEOcu4VWltFI5oTE9TH1DIj0zcKDDKXJcffpZ3ht5lVktKx+WqTyq/KXYEPXqXzzFOw==', 'SECSTAMP007', 'CONCSTAMP007', '01922334455', 1, 0, 1, 0, 'Anika Tabassum', 1, '2025-03-05 12:10:00', 0)
 ON DUPLICATE KEY UPDATE `FullName` = VALUES(`FullName`);
 
 -- Assign User Roles
